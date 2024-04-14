@@ -1,0 +1,231 @@
+ const radarpipeline = await radar.aggregate([
+        {
+            $match: {
+
+                $and: [
+                    {start_time: {$gte: startDate}},
+                    {end_time: {$lte: endDate}}
+                ],
+                "tracks.location.coordinates.0": { $ne: [] },
+                confidence:{$gte: confidenceLevel[0], $lte:confidenceLevel[1] },
+
+
+
+            }
+        },
+        {
+            $project: {
+                type: { $literal: "Feature" }, // Adding a static value "Feature" to comply with GeoJSON
+                confidence: 1,
+                distance: 1,
+                avg_speed: 1,
+                start_time: 1,
+                end_time: 1,
+
+                mmsi: 1,
+                vesselName: 1,
+                vesselType: 1,
+                alert: 1,
+                tracks: {
+                    $slice: [
+                        {
+                            $filter: {
+                                input: "$tracks",
+                                as: "track",
+                                cond: {
+                                    $and: [
+                                        {$gte: ["$$track.time", startDate]},
+                                        {$lte: ["$$track.time", endDate]}
+                                    ]
+                                }
+                            }
+                        }, trackLimit
+                    ]
+                },
+                hausdorff_distance: {
+                    mmsi:1,
+                    distance:1
+                },
+
+            }
+        },
+
+
+
+
+        {
+            $addFields: {
+
+                geometry: {
+                    type: "LineString",
+                    coordinates:{
+
+                        $reduce: {
+                            input: "$tracks",
+                            initialValue: [],
+                            in: {
+                                $concatArrays: [
+                                    "$$value",
+                                    {
+                                        $map: {
+                                            input: ["$$this.location.coordinates"],
+                                            as: "coords",
+                                            in: "$$coords"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+                ,
+                hausdorff_distance: {
+                    $cond: {
+                        if: { $gt: ["$hausdorff_distance.distance", haursdoff] },
+                        then: { mmsi: 0, distance: 0 },
+                        else: "$hausdorff_distance"
+                    }
+                }
+
+            }
+
+        },
+        {
+            $addFields: {
+                dynamic_start_time:  {$arrayElemAt: ["$tracks.time", 0]},
+                dynamic_end_time:  {$arrayElemAt: ["$tracks.time", -1]},
+            }
+        }
+        ,
+        {
+            $addFields: {
+
+                hausdorff_distance2: {
+                    $function: {
+                        body: function(hausdorff_distance,start_time,end_time,aisdata2,coordinates) {
+                            // JavaScript function body here
+                            //console.log(hausdorff_distance)
+                            let mmsi = 0
+                            let hdistance = 1000000000
+                            const deepcopyAisdata = JSON.parse(JSON.stringify(aisdata2));
+
+
+                            let filteredData = deepcopyAisdata.filter(document => {
+                                var onlycoordinates = []
+                                // Filter tracks within the specified time range
+                                const validTracks = document.tracks.filter(track => track.time > start_time && track.time < end_time);
+
+                                // Replace the document's tracks with only those that are valid
+                                document.tracks = validTracks;
+                                validTracks.forEach((data)=>{
+                                    onlycoordinates.push(data["coordinates"])
+                                })
+
+                                document.coordinates = onlycoordinates;
+
+                                // Keep the document only if there are any valid tracks
+                                return validTracks.length > 0;
+
+                            });
+
+                            function euclideanDistance(point1, point2) {
+                                return Math.sqrt(
+                                    Math.pow(point2[0] - point1[0], 2) +
+                                    Math.pow(point2[1] - point1[1], 2)
+                                );
+                            }
+                            function directedHausdorffDistance(coords1, coords2) {
+                                let maxMinDistance = 0;
+                                coords1.forEach(point1 => {
+                                    let minDistance = Infinity;
+                                    coords2.forEach(point2 => {
+                                        const distance = euclideanDistance(point1, point2);
+                                        if (distance < minDistance) {
+                                            minDistance = distance;
+                                        }
+                                    });
+                                    if (minDistance > maxMinDistance) {
+                                        maxMinDistance = minDistance;
+                                    }
+                                });
+                                return maxMinDistance;
+                            }
+                            function hausdorffDistance(coords1, coords2) {
+                                const distance1to2 = directedHausdorffDistance(coords1, coords2);
+                                const distance2to1 = directedHausdorffDistance(coords2, coords1);
+                                return Math.max(distance1to2, distance2to1);
+                            }
+
+
+                            filteredData.forEach((data)=>{
+                                let haursdoffd = hausdorffDistance(coordinates,data.coordinates)
+                                if(haursdoffd<hdistance){
+                                    hdistance = haursdoffd
+                                    mmsi = data.mmsi
+                                }
+
+
+                            })
+
+
+                            return hdistance; // Example calculation
+                        },
+                        args: ["$hausdorff_distance","$dynamic_start_time","$dynamic_end_time",aisdata,"$geometry.coordinates"],
+                        lang: "js"
+                    }
+                }
+            }
+        }
+        ,
+        {
+            $match:{
+                "geometry.coordinates": { $ne: [] }
+            }
+        }
+        ,
+        {
+            $lookup: {
+                from: "ais", // Assuming this is the collection name for aisSchema
+                localField: "hausdorff_distance.mmsi",
+                foreignField: "mmsi",
+                as: "aisData"
+            }
+        },
+        {
+            $unwind: {
+                path: "$aisData",
+                preserveNullAndEmptyArrays: true // If you want to keep documents that do not match any document from the nova_ais_2 collection
+            }
+        },
+        {
+            $addFields: {
+
+                vesselName: {
+                    $cond: {
+                        if: {$eq: ["$hausdorff_distance.mmsi", 0]},
+                        then: "Unidentified",
+                        else: "$aisData.vesselName"
+                    }
+                    //vesselName: "$aisData.vesselName"
+                },
+                vesselType: {
+                    $cond: {
+                        if: {$eq: ["$hausdorff_distance.mmsi", 0]},
+                        then: "0",
+                        else: "$aisData.vesselType"
+                    }
+                    //vesselName: "$aisData.vesselName"
+                }
+
+            }
+        }
+        ,
+        {
+            $project:
+                {
+                    aisData:0
+                }
+        }
+
+
+    ]);

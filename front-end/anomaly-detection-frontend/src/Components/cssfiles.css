@@ -1,0 +1,18 @@
+.MuiPaper-root {
+    background-color: #ffffff;
+}
+.MuiFormControl-root{
+    color: #ffffff;
+}
+input{
+    color:#ffffff;
+}
+.MuiInputBase-input-MuiOutlinedInput-input{
+    color:#ffffff;
+}
+.css-o9k5xi-MuiInputBase-root-MuiOutlinedInput-root{
+    color:#ffffff;
+}
+.datepick{
+    color:#ffffff;
+}
