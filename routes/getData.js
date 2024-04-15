@@ -4,6 +4,8 @@ const routes = express.Router();
 const fs = require('fs');
 const radar = require("../models/radar")
 const ais = require("../models/ais")
+let tracksCount = 0;
+let total_haursdoff = 0;
 //const data = require('../data/26_2023_01_tracks_radar.json')
 var data = 0;
 let parsedData;
@@ -49,6 +51,7 @@ routes.post('/mongo',async (req, res, next) => {
     // const end = new Date(endDate);
     // console.log(start);
     // console.log(end);
+
     let startDate = 1672532840;
     let endDate = 1672615640;
     let confidenceLevel = [0,1];
@@ -347,6 +350,7 @@ routes.post('/mongo',async (req, res, next) => {
     ]);
 
     if(temporal_prediction){
+        total_haursdoff = 0;
         const aisdata = await ais.aggregate([
             {
                 $match: {
@@ -476,30 +480,12 @@ routes.post('/mongo',async (req, res, next) => {
             let end_time =  data["dynamic_end_time"]
             let coordinates = data["geometry"]["coordinates"]
             let distancealgo = calculation(start_time,end_time,aisdata,data["geometry"]["coordinates"])
-            data["hausdorff_distance2"] =distancealgo
-            if(distancealgo["distance"]===1000000000) {
-                console.log(start_time,end_time)
+            data["hausdorff_distance"] =distancealgo
+            data["vesselName"] = distancealgo["vesselName"]
+            data["vesselType"] = distancealgo["vesselType"]
 
-            const deepcopyAisdata2 = JSON.parse(JSON.stringify(aisdata));
-            let filteredData = deepcopyAisdata2.filter(document => {
-                var onlycoordinates = []
-                // Filter tracks within the specified time range
-                const validTracks = document.tracks.filter(track => track.time > start_time && track.time < end_time);
+            total_haursdoff = total_haursdoff+distancealgo["distance"]
 
-                // Replace the document's tracks with only those that are valid
-                document.tracks = validTracks;
-                validTracks.forEach((data)=>{
-                    onlycoordinates.push(data["coordinates"])
-                })
-
-                document.coordinates = onlycoordinates;
-
-                // Keep the document only if there are any valid tracks
-                return validTracks.length > 0;
-
-            });
-            console.log(filteredData)
-            }
 
 
 
@@ -511,7 +497,7 @@ routes.post('/mongo',async (req, res, next) => {
             //console.log(hausdorff_distance)
             let mmsi = 0
             let vesselType = 0
-            let vesselName = 0
+            let vesselName = "Unidentified"
             let hdistance = 1000000000
             const deepcopyAisdata = JSON.parse(JSON.stringify(aisdata2));
 
@@ -582,7 +568,7 @@ routes.post('/mongo',async (req, res, next) => {
 
     }
 
-
+    tracksCount = radarpipeline.length;
     res.send(radarpipeline);
 
 
@@ -994,4 +980,7 @@ routes.post("/countbytype", async (req, res, next) =>{
 
 })
 
+routes.post("/totaltrajectory", async (req, res, next)=>{
+    res.json({"total_trajectories":tracksCount,"total_distance":total_haursdoff})
+})
 module.exports=routes;

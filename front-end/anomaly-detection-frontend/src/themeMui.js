@@ -2,7 +2,6 @@ import {createTheme} from "@mui/material/styles";
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import { blue } from '@mui/material/colors';
-import ais from "../../../models/ais";
 export const theme = createTheme({
     components: {
         MuiInputBase: {

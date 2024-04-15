@@ -57,6 +57,8 @@ function App() {
   const leaflet_ids = useRef({});
   const confvalue = useRef([0, 100]);
   const selectedCircleLayerdialog = useRef(null);
+  //const temporal_prediction = useRef(false);
+  const [temporal_prediction,settemporal_prediction] = useState(false)
 
       //runs only the first time and fetches data if you want to fetch data on any other time use the deps
   useEffect(() => {
@@ -201,6 +203,8 @@ function App() {
       console.log(selectedVessel.current);
 
       console.log(confvalue.current);
+      console.log("haha")
+      console.log(temporal_prediction);
 
       leaflet_ids.current = {}
     fetchdata(startDate.current,endDate.current,selectedVessel.current);
@@ -223,14 +227,18 @@ function App() {
     if(selectedVesselvar.length === 0){
       selectedVesselvar = Object.keys(vesselTypeOnly.current).map(key => parseInt(key))
     }
-
+    let temporal = "false"
     //console.log(selectedVesselvar)
+    if(temporal_prediction){
+      temporal = "true"
+    }
 
     finaljs.current = JSON.stringify({
       "startDate": startDatevar,
       "endDate": endDatevar,
       "selectedVessel":selectedVesselvar,
-      "confidence":confvalue.current
+      "confidence":confvalue.current,
+      "temporal_prediction":temporal
     })
 
 
@@ -377,12 +385,40 @@ function App() {
 
   },[mydata]);
 
-  function add_circles(data,circleLayer,source ){
+  async function add_circles(data,circleLayer,source ){
+
+
+    let avghaursdoff = 0;
+    if(source=="Radar" && temporal_prediction.current){
+      const response = await fetch('http://localhost:5000/api/getdata/totaltrajectory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const responseData = await response.json();
+      avghaursdoff = (responseData["total_distance"]/responseData["total_trajectories"])*.80
+
+
+    }
+
+
     data.forEach((routes) => {
       try{
         let color;
         if(source=="Radar"){
           color = "#0ac5ff"
+          if(temporal_prediction.current){
+            if(routes.hausdorff_distance.distance>=avghaursdoff){
+              routes.hausdorff_distance.mmsi = 0;
+              routes.hausdorff_distance.distance = 0;
+              routes.vesselName = "Unidentified";
+              routes.vesselType = 0;
+
+
+            }
+          }
         if (routes.hausdorff_distance.mmsi  == 0) {
           color = "#ff6e37"
           //console.log(routes.hausdorff_distance);
@@ -532,6 +568,11 @@ function App() {
       boxSizing: 'border-box',
     },
   }));
+  useEffect(() => {
+
+      setfilterSubmit(true);
+
+  }, [temporal_prediction]);
 
   useEffect(() => {
     if(circleLayerAIS.current && fg_AIS.current){
@@ -560,6 +601,12 @@ function App() {
   }, [aisswitch,radarswitch]);
   const clicksetais = (event) => {
     setaisswitch(event.target.checked)
+    //console.log(event.target.checked);
+
+  }
+
+  const clicksettemporal = (event) => {
+    settemporal_prediction(event.target.checked)
     //console.log(event.target.checked);
 
   }
@@ -642,6 +689,11 @@ function App() {
         {/*<p style={{paddingRight:"-5px",fontSize:"15px"}}>Radar: </p>*/}
         {/*{<Switch sx={{ transform: 'scale(0.85) translateX(-15%)'}} defaultChecked />}*/}
         <Stack direction="row" spacing={1} alignItems="center" sx={{paddingLeft:"5px"}}>
+          <Typography>Temporal Prediction : </Typography>
+          <AntSwitch  inputProps={{ 'aria-label': 'ant design' }}
+                      defaultChecked={temporal_prediction}
+                      onChange={clicksettemporal}/>
+
           <Typography>Radar : </Typography>
           <AntSwitch  inputProps={{ 'aria-label': 'ant design' }}
           //onClick =

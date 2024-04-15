@@ -59,6 +59,7 @@ const VesselDialog = (props) => {
 
         }).then((response) => response.json())
             .then((data) => {
+                //console.log(data);
                 data.forEach((routes) => {
                     //console.log(data);
                     let latLng = [routes.geometry.coordinates[routes.geometry.coordinates.length - 1][1], routes.geometry.coordinates[routes.geometry.coordinates.length - 1][0]];
