@@ -8,6 +8,7 @@ import React, {useEffect, useRef, useState} from "react";
 import data from "./26_2023_01_tracks_radar.json"
 import Sidebar from "./Components/Sidebar";
 import dayjs from 'dayjs';
+import Button from '@mui/material/Button';
 import horizontal_bar from "./Components/Horizontal_bar";
 import {vesselTypesDict} from "./vesselType";
 import VesselDialog from "./Components/VesselDialog";
@@ -24,6 +25,8 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import RouteIcon from '@mui/icons-material/Route';
 import $ from 'jquery';
+import TextField from '@mui/material/TextField';
+import Slide from '@mui/material/Slide';
 
 
 
@@ -59,6 +62,9 @@ function App() {
   const selectedCircleLayerdialog = useRef(null);
   //const temporal_prediction = useRef(false);
   const [temporal_prediction,settemporal_prediction] = useState(false)
+  const [spatialThresholdVisibility,setspatialThresholdVisibility] = useState(false);
+  const temporal_prediction_start = useRef(0);
+  const temporal_prediction_end = useRef(0)
 
       //runs only the first time and fetches data if you want to fetch data on any other time use the deps
   useEffect(() => {
@@ -238,7 +244,9 @@ function App() {
       "endDate": endDatevar,
       "selectedVessel":selectedVesselvar,
       "confidence":confvalue.current,
-      "temporal_prediction":temporal
+      "temporal_prediction":temporal,
+      "temporal_prediction_start":temporal_prediction_start.current,
+      "temporal_prediction_end":temporal_prediction_end.current
     })
 
 
@@ -569,6 +577,12 @@ function App() {
     },
   }));
   useEffect(() => {
+    if(temporal_prediction){
+      setspatialThresholdVisibility(true);
+    }
+    else{
+      setspatialThresholdVisibility(false);
+    }
 
       setfilterSubmit(true);
 
@@ -606,7 +620,7 @@ function App() {
   }
 
   const clicksettemporal = (event) => {
-    settemporal_prediction(event.target.checked)
+    settemporal_prediction(!temporal_prediction)
     //console.log(event.target.checked);
 
   }
@@ -619,6 +633,11 @@ function App() {
   // useEffect(() => {
   //   console.log(width)
   // }, [width]);
+  const temporal_threshold = () =>{
+    console.log(temporal_prediction_start.current);
+    console.log(temporal_prediction_end.current);
+    setfilterSubmit(true);
+  }
 
 
 
@@ -822,8 +841,57 @@ function App() {
       <></>
 
 
+          <Slide direction="right" in={spatialThresholdVisibility} >
+          <Box
+          component="form"
+          sx={{
+            '& .MuiTextField-root': { m: 1, width: '25ch' },
+            zIndex: 1000, // Ensure it's above other elements
+            backgroundColor: 'rgb(255,255,255)', // Optional, for visibility
+            borderRadius: '4px',
+            position: 'absolute',
+            top: "20%", // Adjust top as needed
+            left: '1%',
+            transform: 'translateY(-100%)',
+            display: 'flex',
+
+
+          }}
+          noValidate
+          autoComplete="off"
+      >
+        <div>
+          <Typography>Write The Temporal Threshold (In minutes)</Typography>
+          <TextField
+
+
+              label="Start Time"
+              defaultValue={temporal_prediction_start.current}
+              //value={temporal_prediction_start.current}
+              onChange={(event)=>{temporal_prediction_start.current=event.target.value}}
+          />
+          <TextField
+
+              label="End Time"
+              defaultValue={temporal_prediction_end.current}
+              onChange={(event)=>{temporal_prediction_end.current=event.target.value}}
+
+          />
+          <Button sx={{top: "19%", marginRight:"5px"}} variant="contained" onClick={temporal_threshold}>Submit</Button>
+        </div>
+      </Box>
+          </Slide>
+
+
+
     </div>
+
+
+
 </div>
+
+
+
   );
 }
 

@@ -58,6 +58,8 @@ routes.post('/mongo',async (req, res, next) => {
     let trackLimit = 100;
     let haursdoff = 0.01;
     let temporal_prediction = false;
+    let temporal_prediction_start= 0;
+    let temporal_prediction_end = 0;
     haursdoff = .01;
     console.log(req.body)
 
@@ -69,7 +71,8 @@ routes.post('/mongo',async (req, res, next) => {
     if (req.body.confidence) confidenceLevel = req.body.confidence;
     if (req.body.haursdoff) haursdoff = parseFloat(req.body.haursdoff);
     if (req.body.temporal_prediction) temporal_prediction = (req.body.temporal_prediction.toLowerCase()=== "true");
-
+    if (req.body.temporal_prediction_start) temporal_prediction_start = parseInt(req.body.temporal_prediction_start);
+    if (req.body.temporal_prediction_end) temporal_prediction_end = parseInt(req.body.temporal_prediction_end);
 
     // const aisdata = await ais.aggregate([
     //     {
@@ -479,7 +482,7 @@ routes.post('/mongo',async (req, res, next) => {
             let start_time = data["dynamic_start_time"]
             let end_time =  data["dynamic_end_time"]
             let coordinates = data["geometry"]["coordinates"]
-            let distancealgo = calculation(start_time,end_time,aisdata,data["geometry"]["coordinates"])
+            let distancealgo = calculation(start_time+(temporal_prediction_start*60),end_time+(temporal_prediction_end*60),aisdata,data["geometry"]["coordinates"])
             data["hausdorff_distance"] =distancealgo
             data["vesselName"] = distancealgo["vesselName"]
             data["vesselType"] = distancealgo["vesselType"]
