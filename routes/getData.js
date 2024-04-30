@@ -391,8 +391,8 @@ routes.post('/mongo',async (req, res, next) => {
                                     as: "track",
                                     cond: {
                                         $and: [
-                                            {$gte: ["$$track.time", startDate]},
-                                            {$lte: ["$$track.time", endDate]},
+                                            {$gte: ["$$track.time", (startDate+(temporal_prediction_start*60))]},
+                                            {$lte: ["$$track.time", (endDate+(temporal_prediction_end*60))]},
                                             // {$gte: ["$$track.confidence", confidenceLevel[0]]},
                                             // {$lte: ["$$track.confidence", confidenceLevel[1]]}
                                         ]
@@ -502,6 +502,8 @@ routes.post('/mongo',async (req, res, next) => {
             let vesselType = 0
             let vesselName = "Unidentified"
             let hdistance = 1000000000
+             let ais_first = 0
+             let ais_last = 0
             const deepcopyAisdata = JSON.parse(JSON.stringify(aisdata2));
 
 
@@ -522,6 +524,7 @@ routes.post('/mongo',async (req, res, next) => {
                 return validTracks.length > 0;
 
             });
+            //console.log(filteredData["tracks"]);
 
             function euclideanDistance(point1, point2) {
                 return Math.sqrt(
@@ -559,6 +562,8 @@ routes.post('/mongo',async (req, res, next) => {
                     mmsi = data.mmsi
                     vesselName = data.vesselName
                     vesselType = data.vesselType
+                    ais_first = data["tracks"][0];
+                    ais_last = data["tracks"].slice(-1)[0];
 
                 }
 
@@ -566,7 +571,7 @@ routes.post('/mongo',async (req, res, next) => {
             })
 
 
-            return {"distance":hdistance,"mmsi":mmsi,"vesselName":vesselName,"vesselType":vesselType}; // Example calculation
+            return {"distance":hdistance,"mmsi":mmsi,"vesselName":vesselName,"vesselType":vesselType,"ais_first":ais_first,"ais_last":ais_last}; // Example calculation
         }
 
     }
