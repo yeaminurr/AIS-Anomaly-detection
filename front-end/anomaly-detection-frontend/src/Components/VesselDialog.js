@@ -40,7 +40,10 @@ const VesselDialog = (props) => {
     console.log( props.currentDialog)
     const markpredictedAIS = () => {
         console.log(props.currentDialog["vesselName"])
+        console.log(props.currentDialog["hausdorff_distance"])
+
         if(!props.selectedCircleLayer.current )props.selectedCircleLayer.current = L.layerGroup().addTo(props.maplayer.current);
+        props.selectedCircleLayer.current.clearLayers();
         let source = ""
 
         if (props.dialogdataname.current == "AIS") {
@@ -88,6 +91,28 @@ const VesselDialog = (props) => {
                         marker.openPopup()
                     }
                 });
+                if("ais_first" in props.currentDialog["hausdorff_distance"]){
+
+             let  ais_start =  [ props.currentDialog["hausdorff_distance"]["ais_first"]["coordinates"][1],props.currentDialog["hausdorff_distance"]["ais_first"]["coordinates"][0]]
+                let  ais_last =  [ props.currentDialog["hausdorff_distance"]["ais_last"]["coordinates"][1],props.currentDialog["hausdorff_distance"]["ais_last"]["coordinates"][0]]
+
+                let marker2 = L.circleMarker(ais_start, {
+                    color: "#fdfdfd",
+                    fillOpacity: .7,
+                    opacity: 1,
+                    radius: 5.5,
+
+                }).bindPopup("<b>Start</b>"+currentSelected.current);
+                let marker3 = L.circleMarker(ais_last, {
+                    color: "#fdfdfd",
+                    fillOpacity: .7,
+                    opacity: 1,
+                    radius: 5.5,
+
+                }).bindPopup("<b>end</b>"+currentSelected.current);
+                props.selectedCircleLayer.current.addLayer(marker2);
+                props.selectedCircleLayer.current.addLayer(marker3);
+                }
 
             });
         props.setdialogState(false);

@@ -392,7 +392,7 @@ routes.post('/mongo',async (req, res, next) => {
                                     cond: {
                                         $and: [
                                             {$gte: ["$$track.time", (startDate+(temporal_prediction_start*60))]},
-                                            {$lte: ["$$track.time", (endDate+(temporal_prediction_end*60))]},
+                                            {$lte: ["$$track.time", (endDate+(temporal_prediction_start*60))]},
                                             // {$gte: ["$$track.confidence", confidenceLevel[0]]},
                                             // {$lte: ["$$track.confidence", confidenceLevel[1]]}
                                         ]
@@ -482,7 +482,7 @@ routes.post('/mongo',async (req, res, next) => {
             let start_time = data["dynamic_start_time"]
             let end_time =  data["dynamic_end_time"]
             let coordinates = data["geometry"]["coordinates"]
-            let distancealgo = calculation(start_time+(temporal_prediction_start*60),end_time+(temporal_prediction_end*60),aisdata,data["geometry"]["coordinates"])
+            let distancealgo = calculation(start_time+(temporal_prediction_start*60),end_time+(temporal_prediction_start*60),aisdata,data["geometry"]["coordinates"])
             data["hausdorff_distance"] =distancealgo
             data["vesselName"] = distancealgo["vesselName"]
             data["vesselType"] = distancealgo["vesselType"]

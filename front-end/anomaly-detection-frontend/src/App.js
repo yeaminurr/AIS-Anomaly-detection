@@ -862,22 +862,22 @@ function App() {
           autoComplete="off"
       >
         <div>
-          <Typography>Write The Temporal Threshold (In minutes)</Typography>
+          <Typography style={{margin : "5px"}}>Write The Temporal Fuzziness (In minutes)</Typography>
           <TextField
 
 
-              label="Start Time"
+              label="Temporal Fuzziness Value"
               defaultValue={temporal_prediction_start.current}
               //value={temporal_prediction_start.current}
               onChange={(event)=>{temporal_prediction_start.current=event.target.value}}
           />
-          <TextField
+          {/*<TextField*/}
 
-              label="End Time"
-              defaultValue={temporal_prediction_end.current}
-              onChange={(event)=>{temporal_prediction_end.current=event.target.value}}
+          {/*    label="End Time"*/}
+          {/*    defaultValue={temporal_prediction_end.current}*/}
+          {/*    onChange={(event)=>{temporal_prediction_end.current=event.target.value}}*/}
 
-          />
+          {/*/>*/}
           <Button sx={{top: "19%", marginRight:"5px"}} variant="contained" onClick={temporal_threshold}>Submit</Button>
         </div>
       </Box>
