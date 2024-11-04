@@ -1,0 +1,41 @@
+.shape {
+  fill-opacity: 0.4;
+  stroke: none;
+}
+.shape:hover {
+  fill-opacity: 0.75;
+  z-index: 100;
+}
+.scale {
+  stroke: rgba(240, 255, 255, 0.425);
+  stroke-width: 2px;
+}
+.axis {
+  stroke: #fff;
+  stroke-width: 0.05px;
+}
+.caption {
+  fill: #eaeaea73;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-weight: 200;
+  font-size: 1.3em;
+}
+.dot {
+  /* fill: #fff;
+  stroke: #e7e8e7;
+  r: 3;
+  -webkit-transition: r 0.2s;
+  -o-transition: r 0.2s;
+  transition: r 0.2s; */
+}
+.dot:hover {
+  /* stroke: #bbb;
+  r: 8; */
+}
+.caption {
+  fill: rgb(119, 119, 119);
+  font-weight: 400;
+  /* text-shadow: 1px 1px 0 #fff; */
+}

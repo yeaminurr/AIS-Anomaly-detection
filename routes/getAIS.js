@@ -53,6 +53,7 @@ routes.post("/",async (req, res, next) => {
             $project: {
                 type: { $literal: "Feature" }, // Adding a static value "Feature" to comply with GeoJSON
                 confidence: 1,
+                id:1,
                 distance: 1,
                 avg_speed: 1,
                 start_time: 1,

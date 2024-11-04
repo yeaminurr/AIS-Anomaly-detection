@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef,useContext} from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -14,6 +14,7 @@ import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
+import {AppContext} from "../AppContext";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -31,13 +32,15 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 }));
 
+
 const VesselDialog = (props) => {
     const currentSelected = useRef(null);
+    const { selectedMap, setSelectedMap} = useContext(AppContext);
     //const selectedCircleLayer = useRef(null);
     const handleClose = () =>{
         props.setdialogState(false)
     }
-    console.log( props.currentDialog)
+    //console.log( props.currentDialog)
     const markpredictedAIS = () => {
         console.log(props.currentDialog["vesselName"])
         console.log(props.currentDialog["hausdorff_distance"])
@@ -117,6 +120,11 @@ const VesselDialog = (props) => {
             });
         props.setdialogState(false);
     }
+    function addClusterPage(){
+        setSelectedMap( props.currentDialog["id"])
+
+
+    }
 
                 //startDate.current = endDate.current = null;
 
@@ -182,6 +190,9 @@ const VesselDialog = (props) => {
                             Remove Marker
                         </Button>
                     }
+                    <Button autoFocus onClick={addClusterPage}>
+                        Find In Clusters
+                    </Button>
 
                 </DialogActions>
             </BootstrapDialog>

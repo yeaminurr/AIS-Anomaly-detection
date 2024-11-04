@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 
 const aisSchema = new Schema(
     {
+        id:Number,
         mmsi: Number,
         vesselName: String,
         imo: String,

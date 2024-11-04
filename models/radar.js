@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const radarOptimizedSchema = new Schema(
     {
+        id:Number,
         confidence: Number,
         distance: Number,
         avg_speed: Number,
