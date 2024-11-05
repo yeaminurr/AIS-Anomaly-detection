@@ -14,6 +14,7 @@ import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
+import DifferenceDialog from "./DifferenceDialog";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -33,6 +34,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 const VesselDialog = (props) => {
     const currentSelected = useRef(null);
+    const [differenceDialogopen, setDifferenceDialogopen] = React.useState(false);
     //const selectedCircleLayer = useRef(null);
     const handleClose = () =>{
         props.setdialogState(false)
@@ -41,6 +43,7 @@ const VesselDialog = (props) => {
     const markpredictedAIS = () => {
         console.log(props.currentDialog["vesselName"])
         console.log(props.currentDialog["hausdorff_distance"])
+        setDifferenceDialogopen(true);
 
         if(!props.selectedCircleLayer.current )props.selectedCircleLayer.current = L.layerGroup().addTo(props.maplayer.current);
         props.selectedCircleLayer.current.clearLayers();
@@ -185,6 +188,11 @@ const VesselDialog = (props) => {
 
                 </DialogActions>
             </BootstrapDialog>
+
+            <DifferenceDialog
+                differenceDialogopen = {differenceDialogopen}
+                setDifferenceDialogopen = {setDifferenceDialogopen}
+            />
 
 
 

@@ -258,6 +258,7 @@ routes.post('/mongo',async (req, res, next) => {
 
 
 
+
         {
             $addFields: {
 
@@ -290,6 +291,12 @@ routes.post('/mongo',async (req, res, next) => {
                         then: { mmsi: 0, distance: 0 },
                         else: "$hausdorff_distance"
                     }
+                },
+                sumspeed: {
+                    $sum: "$tracks.speed"
+                },
+                sizetracks: {
+                    "$size": "$tracks"
                 }
 
             }
@@ -337,7 +344,13 @@ routes.post('/mongo',async (req, res, next) => {
                 }
                 ,
                 dynamic_start_time:  {$arrayElemAt: ["$tracks.time", 0]},
-                dynamic_end_time:  {$arrayElemAt: ["$tracks.time", -1]}
+                dynamic_end_time:  {$arrayElemAt: ["$tracks.time", -1]},
+                avgspeed: {
+                    "$divide": [
+                        "$sumspeed",
+                        "$sizetracks"
+                    ]
+                }
 
             }
         }

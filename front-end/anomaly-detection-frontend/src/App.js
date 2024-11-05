@@ -27,6 +27,10 @@ import RouteIcon from '@mui/icons-material/Route';
 import $ from 'jquery';
 import TextField from '@mui/material/TextField';
 import Slide from '@mui/material/Slide';
+import InputLabel from "@mui/material/InputLabel";
+import Checkbox from '@mui/material/Checkbox';
+
+
 
 
 
@@ -773,7 +777,7 @@ function App() {
               sm: 180, // 600px width on small screens
               md: 180, // 700px width on medium screens
               lg: 180, // 800px width on large screens
-              xl: 180, // 900px width on extra-large screens
+              xl: 200, // 900px width on extra-large screens
             },
 
 
@@ -781,7 +785,7 @@ function App() {
               sm: 250, // 600px width on small screens
               md: 250, // 700px width on medium screens
               lg: 250, // 800px width on large screens
-              xl: 250, // 900px width on extra-large screens
+              xl: 270, // 900px width on extra-large screens
             }
 
           }}
@@ -789,7 +793,7 @@ function App() {
 
         <Stack direction="column" spacing={1}>
           <Stack direction="row" spacing={1}  sx={{paddingLeft:"5px",paddingTop:"5px", alignItems:"center"}} style={{alignItems:"center"}}>
-            <h4 style={{textAlign:"center", alignItems:"center"}}>Navigation Helper</h4>
+            <h5 style={{textAlign:"left", alignItems:"center"}}>Navigation Helper</h5>
           </Stack>
         <Stack direction="row" spacing={1}  sx={{paddingLeft:"5px",paddingTop:"5px"}}>
           <i className={"circle"} style = {{backgroundColor:"#5efc83"}}></i>
@@ -841,12 +845,14 @@ function App() {
       <></>
 
 
+
+
           <Slide direction="right" in={spatialThresholdVisibility} >
           <Box
           component="form"
           sx={{
             '& .MuiTextField-root': { m: 1, width: '25ch' },
-            zIndex: 1000, // Ensure it's above other elements
+            zIndex: 10000, // Ensure it's above other elements
             backgroundColor: 'rgb(255,255,255)', // Optional, for visibility
             borderRadius: '4px',
             position: 'absolute',
@@ -857,12 +863,37 @@ function App() {
 
 
 
+
           }}
           noValidate
           autoComplete="off"
       >
         <div>
-          <Typography style={{margin : "5px"}}>Write The Temporal Fuzziness (In minutes)</Typography>
+          <Typography style={{margin : "5px"}}>Spatial Thresholds for Prediction</Typography>
+
+          <Typography style={{margin : "5px", fontSize:"14px"}}>Spatial Distance</Typography>
+          <p style={{marginTop:"0px",margin:"5px"}}>
+            (Write a Value from .0001 to 1, Average is XX)
+          </p>
+          <TextField
+        label="Spatial Distance"
+              //defaultValue={}
+              //value={temporal_prediction_start.current}
+              onChange={(event)=>{}}
+          />
+
+          <Typography style={{margin : "5px"}}>Temporal Thresholds for Prediction</Typography>
+
+          <Stack direction="row" spacing={1}  sx={{alignItems:"center", textAlign:"center", transform: 'translateX(18%)'}} style={{alignItems:"center", textAlign:"center"}}>
+            <Typography style={{margin : "5px",  fontSize:"14px"}}>Temporal Prediction</Typography>
+
+            <AntSwitch  inputProps={{ 'aria-label': 'ant design' }}
+                        defaultChecked={temporal_prediction}
+                        onChange={clicksettemporal}/>
+          </Stack>
+
+
+          <Typography style={{margin : "5px",  fontSize:"14px"}}>Write The Temporal Fuzziness (In minutes)</Typography>
           <TextField
 
 
@@ -871,6 +902,11 @@ function App() {
               //value={temporal_prediction_start.current}
               onChange={(event)=>{temporal_prediction_start.current=event.target.value}}
           />
+          <Stack direction="row"  sx={{justifyContent:"center"}} spacing={1}>
+          <FormControlLabel  control={<Checkbox />} label="Forward" />
+          <FormControlLabel  control={<Checkbox />} label="Backward" />
+          </Stack>
+
           {/*<TextField*/}
 
           {/*    label="End Time"*/}
@@ -878,7 +914,9 @@ function App() {
           {/*    onChange={(event)=>{temporal_prediction_end.current=event.target.value}}*/}
 
           {/*/>*/}
-          <Button sx={{top: "19%", marginRight:"5px"}} variant="contained" onClick={temporal_threshold}>Submit</Button>
+          {/*<Button sx={{top: "19%", marginRight:"5px"}} variant="contained" onClick={temporal_threshold}>Submit</Button>*/}
+          <p></p>
+          <Button sx={{marginTop:"-10px", marginBottom:"5px"}} variant="contained" onClick={temporal_threshold}>Submit</Button>
         </div>
       </Box>
           </Slide>

@@ -1,0 +1,73 @@
+db.collection.aggregate([
+  {
+    $project: {
+      type: {
+        $literal: "Feature"
+      },
+      // Adding a static value "Feature" to comply with GeoJSON
+      // confidence: 1,
+      // distance: 1,
+      // avg_speed: 1,
+      // start_time: 1,
+      // end_time: 1,
+      mmsi: 1,
+      vesselName: 1,
+      vesselType: 1,
+      // alert: 1,
+      tracks: {
+        $slice: [
+          {
+            $filter: {
+              input: "$tracks",
+              as: "track",
+              cond: {
+                $and: [
+                  {
+                    $gte: [
+                      "$$track.time",
+                      1672561327
+                    ]
+                  },
+                  {
+                    $lte: [
+                      "$$track.time",
+                      1672561355
+                    ]
+                  },
+                  // {$gte: ["$$track.confidence", confidenceLevel[0]]},
+                  // {$lte: ["$$track.confidence", confidenceLevel[1]]}
+
+                ]
+              }
+            }
+          },
+          100
+        ]
+      }
+    }
+  },
+  {
+    "$project": {
+      tracks: 1,
+      sum: {
+        $sum: "$tracks.speed"
+      },
+      size: {
+        "$size": "$tracks"
+      }
+    }
+  },
+  {
+    "$project": {
+      tracks: 1,
+      sum: 1,
+      size: 1,
+      avg: {
+        "$divide": [
+          "$sum",
+          "$size"
+        ]
+      }
+    }
+  }
+])

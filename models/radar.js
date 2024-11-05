@@ -24,6 +24,8 @@ const radarOptimizedSchema = new Schema(
                         enum: ["point"],
                     },
                     coordinates: [Number],
+                    speed: Number,
+                    heading: Number
                 }
             },
         ],

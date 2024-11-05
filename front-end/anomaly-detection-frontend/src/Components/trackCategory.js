@@ -230,9 +230,10 @@ const TrackCategory= (props) => {
 
 
   return(<div>
-    <h4 style={{paddingBottom:0}}>Radar Tracks:</h4>
+    <p></p>
+    <h6 style={{paddingBottom:0}}>Radar Tracks:</h6>
       <div ref={chartRefbar} id="hbardiv"></div>
-    <h4 style={{paddingBottom:0}}>AIS Tracks:</h4>
+    <h6 style={{paddingBottom:0}}>AIS Tracks:</h6>
     <div ref={chartRefbarAIS} id="hbardiv2"></div>
 
   </div>);
