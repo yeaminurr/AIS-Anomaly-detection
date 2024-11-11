@@ -10,7 +10,19 @@ const LineChart = (props) => {
        function count_for_data(variable) {
            var mydata = []
            variable.forEach(d=>{
-               const countsByDate = props.rawdata.filter(row => row.source === d).reduce((acc, entry) => {
+               const countsByDate = props.rawdata.filter(row => {
+                   if(props.selectedCluster == null ||props.selectedCluster=="all"){
+                       return row.source === d;
+                   }
+                   else {
+                       return row.source === d && row.Kmeans_cluster === parseInt(props.selectedCluster);
+                   }
+
+
+               }
+
+
+               ).reduce((acc, entry) => {
                    const date = entry.ldate;
 
                    // If the date already exists in the accumulator, increment the count
@@ -34,6 +46,7 @@ const LineChart = (props) => {
                    item.percentage = ((item.count / totalCount) * 100).toFixed(2); // Calculate percentage
                });
 
+
                mydata.push(sortedData);
            })
 
@@ -43,13 +56,14 @@ const LineChart = (props) => {
         //console.log(countsByDate);
         if(props.dataType == "all"){
             getdata = count_for_data(["AIS","radar"]);
+            console.log(props.selectedCluster)
         }
-        else{
+        if(props.dataType=="AIS" || props.dataType=="radar"){
             console.log(props.dataType);
             getdata = count_for_data([props.dataType]);
         }
 
-       console.log(getdata);
+
         //console.log(getdata)
 
 
@@ -103,7 +117,7 @@ const LineChart = (props) => {
         // Add Y axis
         var y = d3.scaleLinear()
             .domain([0, max])
-            .range([height, 0]);
+            .range([height,60]);
         svg.current.append("g")
             .call(d3.axisLeft(y));
 
@@ -131,6 +145,8 @@ const LineChart = (props) => {
             .y1(d => y(d.percentage)); // Set the top of the area to the line value
 
         const colors = ["#00ffbc", "#ff00bc"]; // Add more colors if more datasets
+
+
 
         getdata.forEach((dataset, i) => {
             // Add the line
@@ -167,10 +183,34 @@ const LineChart = (props) => {
 
 
         });
+        if(getdata.length > 0){
+
+        const legend = svg.current
+            .selectAll(".legend")
+            .data(getdata)
+            .enter()
+            .append("g")
+            .attr("class", "legend")
+            .attr("transform", (d, i) => `translate(0, ${i * 20})`);
+
+        legend.append("rect")
+            .attr("x", width - 100)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", (d, i) => colors[i]);
+
+        legend.append("text")
+            .attr("x", width - 110)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .style("fill", "white")
+            .text((d, i) => (props.dataType === "all" ? ["AIS", "Radar"][i] : props.dataType === "AIS"?"AIS":props.dataType === "radar"?"Radar":""));
+        }
         // })
 
 
-    },[props.device_height, props.device_width,props.rawdata , props.dataType])
+    },[props.device_height, props.device_width,props.rawdata , props.dataType,props.selectedCluster])
 
 
 

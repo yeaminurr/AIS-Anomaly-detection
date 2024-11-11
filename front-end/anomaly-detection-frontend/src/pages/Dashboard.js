@@ -9,13 +9,25 @@ import {createTheme, ThemeProvider} from "@mui/material/styles";
 import cluster_data_csv from "../rawdata/export_data.csv";
 import TripleToggleSwitch from "../Components/VA/switch/triple";
 import {ToggleButton, ToggleButtonGroup} from "@mui/material";
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Circle_Chart from "../Components/VA/Circle_ColorChart";
+import Line_Bar from "../Components/VA/Line_Bar"
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+
 
 const Dashboard = () => {
     const [rawdData,setRawdata] = useState([]);
     const size = useWindowSize();
-    const [dataType,setDataType] = useState("Both");
-    console.log(size.width);
-    console.log(size.height);
+    const [dataType,setDataType] = useState("all");
+    const [uniqueClusters,setUniqueClusters] = useState([])
+    const [selectedCluster,setSelectedCluster] = useState(null)
+    const [totalCount,setTotalCount] = useState([])
+
     const darkTheme = createTheme({
         palette: {
             mode: 'dark',
@@ -70,22 +82,85 @@ const Dashboard = () => {
         });
 
 
+
     }, []);
-    const onChange = (value) =>setDataType(value );
-    const labels = {
-        left: {
-            title: "AIS",
-            value: "AIS"
-        },
-        right: {
-            title: "Radar",
-            value: "Radar"
-        },
-        center: {
-            title: "Both",
-            value: "all"
-        }
+
+    useEffect(()=>{
+        setUniqueClusters(Array.from(new Set(rawdData.map(item => item.Kmeans_cluster))));
+        setUniqueClusters(prevValue => prevValue.sort())
+        console.log(uniqueClusters)
     }
+    , [rawdData])
+
+    const onChange = (event, value) =>{
+        setDataType(value );}
+    const clusterSelect=(event)=>{
+        setSelectedCluster(event.target.value);
+    }
+
+    // useEffect(() => {
+    //     if(rawdData.length>0){
+    //         var currentArray = [];
+    //         if(selectedCluster == null ||selectedCluster=="all"){
+    //             setTotalCount([100,100]);
+    //             currentArray = [...rawdData];
+    //         }
+    //         else{
+    //             currentArray = rawdData.filter(row =>row.Kmeans_cluster === selectedCluster );
+    //         }
+    //
+    //         currentArray = currentArray.reduce((acc, entry) => {
+    //             const source = entry.source;
+    //
+    //             // If the date already exists in the accumulator, increment the count
+    //             if (acc[source]) {
+    //                 acc[source].count += 1;
+    //             } else {
+    //                 // If the date does not exist, initialize it with count 1
+    //                 acc[source] = {source: source, count: 1};
+    //             }
+    //
+    //             return acc;
+    //         }, {});
+    //         const countsArray = Object.values(currentArray);
+    //         // Calculate the overall total count by summing all counts across dates
+    //         const totalCount = countsArray.reduce((sum, item) => sum + item.count, 0);
+    //         // Add percentage calculation for each date entry based on overall total count
+    //         countsArray.forEach(item => {
+    //             item.percentage = parseFloat(((item.count / totalCount) * 100).toFixed(2)); // Calculate percentage
+    //         });
+    //         const tempArray = [countsArray.filter(row =>row.source === "AIS" )[0].percentage,countsArray.filter(row =>row.source === "radar" )[0].percentage]
+    //         console.log(countsArray.filter(row =>row.source === "AIS" )[0].percentage);
+    //         setTotalCount(tempArray);
+    //     }
+    //
+    // }, [rawdData,selectedCluster]);
+
+    useEffect(() => {
+        if(rawdData.length>0){
+            var currentArray = [];
+            var currentallArray = []
+            if(selectedCluster == null ||selectedCluster=="all"){
+                setTotalCount([100,100]);
+
+            }
+            else{
+                currentallArray = [...rawdData];
+                var totalAIS = currentallArray.filter(row =>row.source === "AIS").length;
+                var totalRadar = currentallArray.filter(row =>row.source === "radar").length;
+                var currentRadar = currentallArray.filter(row =>row.Kmeans_cluster === selectedCluster && row.source === "radar").length;
+                var currentAIS = currentallArray.filter(row =>row.Kmeans_cluster === selectedCluster && row.source === "AIS").length;
+                setTotalCount([(currentAIS/totalAIS)*100,(currentRadar/totalRadar)*100]);
+
+
+
+            }
+
+
+
+        }
+
+    }, [rawdData,selectedCluster]);
 
 
     return(
@@ -93,11 +168,18 @@ const Dashboard = () => {
 
             <Navbar/>
             <Toolbar/>
-            <CssBaseline />
-            <div style={{position:"relative", transform: 'scale(.8)' , padding:"20px"}}>
+            <CssBaseline/>
+            <div style={{
+                position: "relative",
+                transform: 'scale(1)',
+                padding: "20px",
+                alignContent: "center",
+                justifyContent: "center",
+                display: "flex",
+            }}>
 
 
-            <TripleToggleSwitch  onChange={onChange} labels={labels}/>
+                {/*<TripleToggleSwitch  onChange={onChange} labels={labels}/>*/}
                 <ToggleButtonGroup
                     color="primary"
                     value={dataType}
@@ -105,25 +187,98 @@ const Dashboard = () => {
                     onChange={onChange}
                     aria-label="Platform"
                 >
-                    <ToggleButton value="web">Web</ToggleButton>
-                    <ToggleButton value="android">Android</ToggleButton>
-                    <ToggleButton value="ios">iOS</ToggleButton>
+                    <ToggleButton value="AIS">AIS</ToggleButton>
+                    <ToggleButton value="all">Both</ToggleButton>
+                    <ToggleButton value="radar">Radar</ToggleButton>
+
                 </ToggleButtonGroup>
+                <FormControl
+                    sx={{
+                        width: "10%",
+                        marginLeft: "10px"
+                    }}
+                >
+                    <InputLabel id="demo-simple-select-label">Cluster</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        //value={age}
+                        label="Cluster"
+                        onChange={clusterSelect}
+                    >
+                        <MenuItem value={"all"}>
+                            All Clusters
+                        </MenuItem>
+                        {uniqueClusters.map((value) => (
+                            <MenuItem value={value}>
+                                Cluster {value}
+                            </MenuItem>
+
+                        ))}
+                        {/*<MenuItem value={10}>Ten</MenuItem>*/}
+                        {/*<MenuItem value={20}>Twenty</MenuItem>*/}
+                        {/*<MenuItem value={30}>Thirty</MenuItem>*/}
+                    </Select>
+                </FormControl>
 
 
             </div>
-<p></p>
-        <div style={{textAlign:"center"}}>
+            <p></p>
+            <div style={{textAlign: "center"}}>
 
-            
-            
-            <LineChart
-                device_height={size.height}
-                device_width={size.width}
-                rawdata = {rawdData}
-                dataType = {dataType}
-            />
-        </div>
+
+                <LineChart
+                    device_height={size.height}
+                    device_width={size.width}
+                    rawdata={rawdData}
+                    dataType={dataType}
+                    selectedCluster={selectedCluster}
+                />
+                <Circle_Chart
+                    device_height={size.height}
+                    device_width={size.width}
+                    selectedCluster={selectedCluster}
+                    rawdata={rawdData}
+                />
+
+                <div style={{justifyContent: "center",
+                    display: "flex",}}>
+                <Stack
+                    direction="row"
+                    divider={<Divider orientation="vertical" flexItem />}
+                    spacing={2}
+                >
+
+                        <Stack
+                            direction="row"
+                            spacing={2}
+                        >
+                            <Line_Bar line={["AIS", parseInt(totalCount[0])]}
+                                      device_height={size.height}
+                                      device_width={size.width}/>
+                            <Line_Bar line={["Radar", parseInt(totalCount[1])]}
+                                      device_height={size.height}
+                                      device_width={size.width}/>
+                        </Stack>
+
+
+
+                </Stack>
+                </div>
+
+
+
+            </div>
+            {/*<div id="linebar">*/}
+
+
+            {/*    <Line_Bar line={["rarely evaluate", 22]}*/}
+            {/*              device_height={size.height}*/}
+            {/*              device_width={size.width}/>*/}
+
+            {/*</div>*/}
+
+
         </ThemeProvider>
     )
 }

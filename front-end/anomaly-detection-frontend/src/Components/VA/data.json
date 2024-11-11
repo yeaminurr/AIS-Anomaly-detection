@@ -1,0 +1,29 @@
+{"circle_color": {"Very": 23,
+  "Moderately": 50,
+    "Not Very": 17,
+    "Not at All": 7}    ,
+"Horizontal_Bar":{    "Innovation Group": 7 ,
+     "Business Unit": 7,
+     "Executive Management"  : 12,
+     "Multiple Groups' Decision":33,
+     "IT Group": 39},
+
+  "pie_chart":{
+"Anticipated Cost Savings": 29,
+ "New Revenue Stream": 24,
+ "Ability to Reach New Customers": 18,
+    "Increased Agility": 15 ,
+"Reputational Value":  9,
+    "A Customer's Successful Implementation": 3
+},
+  "bar":{"Big Data Analytics" :38,
+    "Al/Machine Learning/Cognitive" : 20,
+    "Public Cloud": 18,
+    "IoT" :14,
+    "Blockchain": 7,
+    "AR/VR" :2,
+    "3D Printing": 1},
+
+  "multipie":
+  {"Yes":53,"No":25,"Unsure":22}
+  }
