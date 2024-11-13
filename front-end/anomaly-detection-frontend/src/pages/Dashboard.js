@@ -18,6 +18,7 @@ import Circle_Chart from "../Components/VA/Circle_ColorChart";
 import Line_Bar from "../Components/VA/Line_Bar"
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
+import Horizon_Bar from "../Components/VA/Horizon_bar_Dashboard";
 
 
 const Dashboard = () => {
@@ -245,8 +246,9 @@ const Dashboard = () => {
                     display: "flex",}}>
                 <Stack
                     direction="row"
-                    divider={<Divider orientation="vertical" flexItem />}
-                    spacing={2}
+                    sx={{ flexWrap: 'wrap' }}
+                    divider={<Divider orientation="vertical" style={{borderInlineWidth:"1px", borderColor:"#FFFFFF"}} flexItem />}
+                    spacing={15}
                 >
 
                         <Stack
@@ -260,6 +262,12 @@ const Dashboard = () => {
                                       device_height={size.height}
                                       device_width={size.width}/>
                         </Stack>
+                    <Horizon_Bar
+                        device_height={size.height}
+                        device_width={size.width}
+                        rawdata = {rawdData}
+                        selectedCluster={selectedCluster}
+                    />
 
 
 

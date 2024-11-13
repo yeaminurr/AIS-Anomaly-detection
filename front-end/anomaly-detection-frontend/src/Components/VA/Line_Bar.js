@@ -7,18 +7,26 @@ const Line_Bar = props => {
 
     useEffect(() => {
         //console.log(props.line)
+        const container = chartRefNbar.current;
             d3.select(chartRefNbar.current).select("svg").remove();
             var data=props.line
+            // console.log(container.clientHeight)
+
+
             const margin = {top: 60, right:20, bottom: 80, left: 20}
             const  height = props.device_height *.22  - margin.top - margin.bottom;
             const width = props.device_width*.10 - margin.left-margin.right;
+
+        // const  height = container.clientHeight  - margin.top - margin.bottom;
+        // const width = container.clientWidth- margin.left-margin.right;
+        console.log(height,width)
             const svg = d3.select(chartRefNbar.current)
                 .append("svg")
                 .attr("class","linebar")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height+ margin.top + margin.bottom)
                 .append("g")
-                .attr("transform", 'translate('+height/2+', '+width/2+')');
+                .attr("transform", 'translate('+margin.left+', '+margin.top+')');
             // data= [data,["",100-data[1]]];
             // const x = d3.scaleLinear()
             //     .domain([0, Math.max(...data.map(d => d[1]))])
@@ -31,29 +39,29 @@ const Line_Bar = props => {
                 .append("rect")
                 .attr("class","bar1")
                 .attr('x',0)
-                .attr("y",height/2.5)
-                .attr("width",width*.70)
-                .attr("height",height/4)
+                .attr("y",(height - height/1.45)+(width*.39)/6)
+                .attr("width",props.device_width*.06)
+                .attr("height",props.device_height*.028)
                 .attr('fill', '#808080');
         //#FFE9C7
             var mainchart = svg
                 .append("rect")
                 .attr("class","bar1")
                 .attr('x',0)
-                .attr("y",height/2.5)
+                .attr("y",(height - height/1.45)+(width*.39)/6)
                 .attr("width",0)
-                .attr("height",height/4)
+                .attr("height",props.device_height*.028)
                 .attr('fill', '#FCB344');
         mainchart
             .transition()
             .duration(800)
-            .attr("width",((width*.70)*(data[1]/100)))
+            .attr("width",((props.device_width*.06)*(data[1]/100)))
 
 
            var label_num = svg
                 .append("text")
                 .text(0+"%")
-                .attr("font-size",width*.39+'px')
+                .attr("font-size",props.device_width*.037+'px')
                 .attr("class","label")
                 .attr("text-anchor", "middle")
                 .attr("x",(width*.70)/2)
@@ -82,7 +90,7 @@ const Line_Bar = props => {
                 .attr("class","label")
                 .attr("text-anchor", "middle")
                 .attr("x",(width*.70)/2)
-                .attr("y",height - height/10)
+                .attr("y",(height - height/1.45)+(width*.39)/1.1)
                 .attr("width",width*.70)
                 .attr("font-weight", "bold")
                 .attr("fill","#ffffff")
@@ -105,7 +113,7 @@ const Line_Bar = props => {
                 mainchart
                     .transition()
                     .duration(800)
-                    .attr("width",((width*.70)*(data[1]/100)));
+                    .attr("width",((props.device_width*.06)*(data[1]/100)));
 
 
 
@@ -123,7 +131,7 @@ const Line_Bar = props => {
             //     .attr('fill', '#69a3b2');
 
 
-    });
+    },[props.device_width,props.device_height,props.line]);
             return(
                 <div ref = {chartRefNbar}
                      // style={{transform:'scale(.6)'}}
