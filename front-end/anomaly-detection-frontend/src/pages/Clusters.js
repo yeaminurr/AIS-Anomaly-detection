@@ -36,6 +36,7 @@ function Clusters(){
     const [selectedData, setSelectedData] = React.useState([]);
     const [currentSelection, setCurrentSelection] = React.useState([]);
     const { selectedMap, setSelectedMap} = useContext(AppContext);
+    const [selectedCluster,setSelectedCluster] = useState("Kmeans_cluster");
 
 
 
@@ -68,6 +69,9 @@ function Clusters(){
                     circ_mean_s: +d.circ_mean_s,                 // Convert to float
                     speed_diff_s: +d.speed_diff_s,               // Convert to float
                     dist_diff__s: +d.dist_diff__s,               // Convert to float
+                    mapped_target_name_shorten: d.mapped_target_name_shorten,
+                    BMM_cluster: +d.BMM_cluster
+
                 };
             }
 
@@ -128,6 +132,13 @@ function Clusters(){
         return () => window.removeEventListener("storage", handleStorageChange);
     }, []);
 
+    const clusterSelect=(event)=>{
+        setSelectedCluster(event.target.value);
+    }
+    useEffect(() => {
+        console.log(selectedCluster);
+    }, [selectedCluster]);
+
     return(
         <ThemeProvider theme={darkTheme}>
 
@@ -161,15 +172,44 @@ function Clusters(){
                                 SelectedData = {selectedData}
                                 setCurrentSelection = {setCurrentSelection}
                                 tempStorage = {tempStorage}
+                                selectedCluster = {selectedCluster}
 
                             />
                         </DropZone>
                         </div>
-                        <div style={{paddingTop: "50px", width: "300px"}}>
+                        <div style={{paddingTop: "50px", width: size.width*.20}}>
 
                             <DraggableItem name="AIS Data" height={size.height} width={size.width}/>
 
                             <DraggableItem name="Radar Data" height={size.height} width={size.width}/>
+
+
+                            <FormControl
+                                sx={{
+                                    width: size.width*.20,
+                                    marginLeft: "10px",
+                                    marginTop:"10px"
+                                }}
+                            >
+                                <InputLabel id="demo-simple-select-label">Cluster</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    //value={age}
+                                    label="Cluster"
+                                    onChange={clusterSelect}
+                                    value={selectedCluster}
+                                >
+                                    <MenuItem value={"Kmeans_cluster"}>
+                                       KMeans Clustering
+                                    </MenuItem>
+                                    <MenuItem value={"BMM_cluster"}>
+                                        Bayesian Gaussian Mixture
+                                    </MenuItem>
+
+
+                                </Select>
+                            </FormControl>
                         </div>
 
 

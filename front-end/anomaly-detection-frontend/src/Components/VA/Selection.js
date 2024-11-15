@@ -32,8 +32,8 @@ function Selection(props){
 
 
         // Set dimensions for the scatterplot
-        const width = props.device_width - 650;
-        const height = props.device_height - 268;
+        const width = props.device_width - props.device_width*.25;
+        const height = props.device_height - props.device_height*.30;
 
         svg.current = container
             .append("svg")
@@ -76,7 +76,7 @@ function Selection(props){
             .attr("cx", d => x(d.tsne1))
             .attr("cy", d => y(d.tsne2))
             .attr("r", 2)
-            .attr("fill", d => colors[d.Kmeans_cluster])  // Use the kmeans column for color
+            .attr("fill", d => colors[d[props.selectedCluster]])  // Use the kmeans column for color
             .style("opacity", 0.7)
             .on("click", function (e, d) {
                 //handleSelectedChange(d);
@@ -144,7 +144,7 @@ function Selection(props){
 
         // Optional: Add legend based on KMeans clusters
         const legend = svg.current.selectAll(".legend")
-            .data(d3.range(0, d3.max(data.map(d => parseInt(d.Kmeans_cluster))) + 1))
+            .data(d3.range(0, d3.max(data.map(d => parseInt(d[props.selectedCluster]))) + 1))
             .enter()
             .append("g")
             .attr("class", "legend")
@@ -164,7 +164,7 @@ function Selection(props){
             .style("fill", "white")
             .text(d => `Cluster ${d}`);
 
-    }, [props.cluster_data,props.dataTypes]);
+    }, [props.cluster_data,props.dataTypes, props.selectedCluster,props.device_height,props.device_width]);
 
     // Programmatic click based on `tempstorage`
     useEffect(() => {
@@ -189,7 +189,7 @@ function Selection(props){
     return (
         <div>
 
-            <div ref={selectionRef} id="scatterContainer" style={{ height: props.device_height - 268 }}></div>
+            <div ref={selectionRef} id="scatterContainer" ></div>
         </div>
     );
 }
