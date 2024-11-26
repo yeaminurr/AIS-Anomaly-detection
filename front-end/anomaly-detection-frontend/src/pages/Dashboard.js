@@ -19,6 +19,7 @@ import Line_Bar from "../Components/VA/Line_Bar"
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Horizon_Bar from "../Components/VA/Horizon_bar_Dashboard";
+import LineChart_daily from "../Components/VA/LineChart_dailyavg";
 
 
 const Dashboard = () => {
@@ -28,6 +29,9 @@ const Dashboard = () => {
     const [uniqueClusters,setUniqueClusters] = useState([])
     const [selectedCluster,setSelectedCluster] = useState(null)
     const [totalCount,setTotalCount] = useState([])
+    const [selectedClusterAlgo,setSelectedClusterAlgo] = useState("Kmeans_cluster");
+    const [selected_column,setSelected_column] = useState(null);
+    const sizeref = useRef([]);
 
     const darkTheme = createTheme({
         palette: {
@@ -74,7 +78,9 @@ const Dashboard = () => {
                     dist_diff__s: +d.dist_diff__s,               // Convert to float
 
                     // Parse date field using `parseDate`
-                    ldate: parseDate(d.ldate) // Replace 'date' with the actual name of your date column in the CSV
+                    ldate: parseDate(d.ldate), // Replace 'date' with the actual name of your date column in the CSV
+                    mapped_target_name_shorten: d.mapped_target_name_shorten,
+                    BMM_cluster: +d.BMM_cluster
                 };
             }
 
@@ -87,7 +93,7 @@ const Dashboard = () => {
     }, []);
 
     useEffect(()=>{
-        setUniqueClusters(Array.from(new Set(rawdData.map(item => item.Kmeans_cluster))));
+        setUniqueClusters(Array.from(new Set(rawdData.map(item => item[selectedClusterAlgo]))));
         setUniqueClusters(prevValue => prevValue.sort())
         console.log(uniqueClusters)
     }
@@ -97,6 +103,9 @@ const Dashboard = () => {
         setDataType(value );}
     const clusterSelect=(event)=>{
         setSelectedCluster(event.target.value);
+    }
+    const clusterAlgoSelect=(event)=>{
+        setSelectedClusterAlgo(event.target.value);
     }
 
     // useEffect(() => {
@@ -149,8 +158,8 @@ const Dashboard = () => {
                 currentallArray = [...rawdData];
                 var totalAIS = currentallArray.filter(row =>row.source === "AIS").length;
                 var totalRadar = currentallArray.filter(row =>row.source === "radar").length;
-                var currentRadar = currentallArray.filter(row =>row.Kmeans_cluster === selectedCluster && row.source === "radar").length;
-                var currentAIS = currentallArray.filter(row =>row.Kmeans_cluster === selectedCluster && row.source === "AIS").length;
+                var currentRadar = currentallArray.filter(row =>row[selectedClusterAlgo] === selectedCluster && row.source === "radar").length;
+                var currentAIS = currentallArray.filter(row =>row[selectedClusterAlgo] === selectedCluster && row.source === "AIS").length;
                 setTotalCount([(currentAIS/totalAIS)*100,(currentRadar/totalRadar)*100]);
 
 
@@ -161,7 +170,7 @@ const Dashboard = () => {
 
         }
 
-    }, [rawdData,selectedCluster]);
+    }, [rawdData,selectedCluster,selectedClusterAlgo]);
 
 
     return(
@@ -220,6 +229,33 @@ const Dashboard = () => {
                         {/*<MenuItem value={20}>Twenty</MenuItem>*/}
                         {/*<MenuItem value={30}>Thirty</MenuItem>*/}
                     </Select>
+
+                </FormControl>
+
+                <FormControl
+                    sx={{
+                        width: size.width*.20,
+                        marginLeft: "10px",
+                    }}
+                >
+                    <InputLabel id="demo-simple-select-label">Cluster Algorithms</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        //value={age}
+                        label="Cluster Algorithms"
+                        onChange={clusterAlgoSelect}
+                        value={selectedClusterAlgo}
+                    >
+                        <MenuItem value={"Kmeans_cluster"}>
+                            KMeans Clustering
+                        </MenuItem>
+                        <MenuItem value={"BMM_cluster"}>
+                            Bayesian Gaussian Mixture
+                        </MenuItem>
+
+
+                    </Select>
                 </FormControl>
 
 
@@ -234,16 +270,19 @@ const Dashboard = () => {
                     rawdata={rawdData}
                     dataType={dataType}
                     selectedCluster={selectedCluster}
+                    selectedClusterAlgo={ selectedClusterAlgo}
                 />
                 <Circle_Chart
                     device_height={size.height}
                     device_width={size.width}
                     selectedCluster={selectedCluster}
                     rawdata={rawdData}
+                    selectedClusterAlgo={ selectedClusterAlgo}
                 />
 
                 <div style={{justifyContent: "center",
-                    display: "flex",}}>
+                    display: "flex",
+                }}>
                 <Stack
                     direction="row"
                     sx={{ flexWrap: 'wrap' }}
@@ -257,21 +296,43 @@ const Dashboard = () => {
                         >
                             <Line_Bar line={["AIS", parseInt(totalCount[0])]}
                                       device_height={size.height}
-                                      device_width={size.width}/>
+                                      device_width={size.width}
+                                      selectedClusterAlgo={ selectedClusterAlgo}/>
                             <Line_Bar line={["Radar", parseInt(totalCount[1])]}
                                       device_height={size.height}
-                                      device_width={size.width}/>
+                                      device_width={size.width}
+                                      selectedClusterAlgo={ selectedClusterAlgo}/>
                         </Stack>
                     <Horizon_Bar
                         device_height={size.height}
                         device_width={size.width}
                         rawdata = {rawdData}
                         selectedCluster={selectedCluster}
+                        selectedClusterAlgo={ selectedClusterAlgo}
+                        setSelected_column = {setSelected_column}
+                        sizeref={sizeref}
                     />
 
 
 
                 </Stack>
+
+
+
+                </div>
+                <div style={{justifyContent: "center",
+                    display: "flex",marginTop: "10px"
+                }}>
+                    <LineChart_daily
+                        selected_column = {selected_column}
+                        device_height={size.height}
+                        device_width={size.width}
+                        rawdata={rawdData}
+                        selectedCluster={selectedCluster}
+                        selectedClusterAlgo={ selectedClusterAlgo}
+
+                    />
+
                 </div>
 
 

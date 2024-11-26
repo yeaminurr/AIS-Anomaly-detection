@@ -5,6 +5,9 @@ import json_data from "./data.json";
 const Horizon_Bar = (props) => {
     var count = 0;
     const chartRefbar = useRef(null);
+    const size = useRef([]);
+    const svg = useRef(null);
+    //size.current = [JSON.parse(JSON.stringify(props.device_height)),JSON.parse(JSON.stringify(props.device_width)) ];
 
     function dataPrep(){
         var data1 = []
@@ -30,7 +33,7 @@ const Horizon_Bar = (props) => {
         }
         else{
             const alldata = props.rawdata;
-            const alldata2 = props.rawdata.filter(row => row.Kmeans_cluster === props.selectedCluster);
+            const alldata2 = props.rawdata.filter(row => row[props.selectedClusterAlgo] === props.selectedCluster);
             const averages = {
                 min_speed: avg(alldata.map(item => item.min_speed)),
                 max_speed: avg(alldata.map(item => item.max_speed)),
@@ -62,6 +65,26 @@ const Horizon_Bar = (props) => {
         }
 
     }
+    function resizeChart(){
+        if(svg.current){
+        const margin = {top: 26.66, right: 220.66, bottom: 26.66, left: 26.66}
+        const  height = props.device_height - (props.device_height * .55) - margin.top - margin.bottom;
+        const width = props.device_width - (props.device_width * .75) - margin.left-margin.right;
+            d3.select(svg.current.node().parentNode)
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom);
+
+            svg.current.attr("transform", `translate(${margin.left}, ${margin.top})`);
+        }
+        //console.log("kori")
+
+    }
+    useEffect(() => {
+        resizeChart();
+
+    },[props.device_height, props.device_width,])
+
+
 
 
     useEffect(() => {
@@ -75,7 +98,7 @@ const Horizon_Bar = (props) => {
 
 
         const datapreparation = dataPrep();
-        d3.select(chartRefbar.current).select("svg").remove();
+
         const data= Object.entries(datapreparation[1])
         const dataAll= Object.entries(datapreparation[0])
 
@@ -84,18 +107,23 @@ const Horizon_Bar = (props) => {
        const  height = props.device_height - (props.device_height * .55) - margin.top - margin.bottom;
        const width = props.device_width - (props.device_width * .75) - margin.left-margin.right;
 
+        d3.select(chartRefbar.current).select("svg").remove();
+
             // const margin = {top: 40-26.66, right: 250-166.66, bottom: 40-26.66, left: 40-26.66}
             // const  height = 500-333.33 - margin.top - margin.bottom;
             // const width = 500+170-446.66 - margin.left-margin.right;
+
+
+        //console.log(size.current)
 // append the svg object to the body of the page
-    const svg = d3.select(chartRefbar.current)
+    svg.current = d3.select(chartRefbar.current)
         .append("svg")
         .attr("class","horizontal_bar")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height+ margin.top + margin.bottom)
         .append("g")
         .attr("transform", 'translate('+margin.left+', '+margin.top+')');
-    console.log(data)
+    //console.log(data)
 
         // const svg = d3.select(chartRefbar.current)
         //     .append("svg")
@@ -147,7 +175,7 @@ const Horizon_Bar = (props) => {
             //     .attr("padding","20px");
     // Mainbar
     //for transition modified bar
-    var bardiagram = svg.selectAll("all")
+    var bardiagram = svg.current.selectAll("all")
         .append('g')
         .data(data)
         .join("rect")
@@ -158,7 +186,7 @@ const Horizon_Bar = (props) => {
         .attr("fill", "#FCB344")
         .attr("padding","20px");
 
-            svg.selectAll("rect")
+            svg.current.selectAll("rect")
                 .data(data)
                 .transition()
                 .duration(2000)
@@ -168,16 +196,28 @@ const Horizon_Bar = (props) => {
 
 
         //for transition modified bar
-        var bardiagram2 = svg.selectAll("all")
+        var bardiagram2 = svg.current.selectAll("all")
             .append('g')
             .data(dataAll)
             .join("rect")
+            .attr("class","mainData")
             .attr("x", x(0) )
             .attr("y", d => y(d[0])+y.bandwidth()+2)
-            .attr("width", d => x(d[1]))
+            .attr("width", 0)
             .attr("height", y.bandwidth()*.30)
             .attr("fill", "#44fc84")
             .attr("padding","20px");
+
+
+        svg.current.selectAll(".mainData")
+            .data(dataAll)
+            .transition()
+            .duration(2000)
+            .attr("width", d => x(d[1]))
+            .delay((d,i) => {return i*200})
+
+
+
 
         // svg.selectAll("rect")
         //     .data(dataAll)
@@ -188,8 +228,18 @@ const Horizon_Bar = (props) => {
 
 
             bardiagram.on("click",function (mydata,myi) {
-                console.log(myi[0]);
-                svg.selectAll("rect")
+                // console.log(myi);
+                // console.log(mydata);
+                // if(mydata.isClicked){}
+                // else {
+                //     mydata.isClicked=false;
+                // }
+                console.log(mydata.target.isClicked)
+
+                if(!mydata.target.isClicked || mydata.isClicked ==false){
+                    props.setSelected_column(myi[0])
+
+                svg.current.selectAll("rect")
                     .data(data)
                     .transition()
                     .duration(500)
@@ -204,7 +254,7 @@ const Horizon_Bar = (props) => {
                     })
                     .delay((d,i) => {return i*50})
 
-                svg.selectAll(".label")
+                svg.current.selectAll(".label")
                     .data(data)
                     .transition()
                     .duration(500)
@@ -222,7 +272,7 @@ const Horizon_Bar = (props) => {
 
                     .delay((d,i) => {return i*50})
 
-                svg.selectAll(".bar_out")
+                svg.current.selectAll(".bar_out")
                     .data(data)
                     .transition()
                     .duration(500)
@@ -239,49 +289,131 @@ const Horizon_Bar = (props) => {
                     .delay((d,i) => {return i*50})
 
 
-            })
-            bardiagram.on("mouseout",function (mydata,myi) {
-                console.log(myi[0]);
-                svg.selectAll("rect")
-                    .data(data)
+                svg.current.selectAll(".mainData")
+                    .data(dataAll)
                     .transition()
                     .duration(500)
-                    .attr("width",  d => x(d[1]))
-                    .delay((d,i) => {return i*50})
+                    .attr("width", function (d,i){
+                        if(d[0]==myi[0]){
 
-                svg.selectAll(".label")
-                    .data(data)
-                    .transition()
-                    .duration(500)
-                    .attr("x", function (d){return x(0)+(((d[1].toString().length+3)/2)*12)})
-                    .delay((d,i) => {return i*50})
-
-                svg.selectAll(".bar_out")
-                    .data(data)
-                    .transition()
-                    .duration(500)
-                    .attr("x", function (d){
-                        if(d[1]<10){
-                            return x(d[1])+55
-                        }
-                        else if(d[1]<15){
-                            return x(d[1])+52
-                        }
-                        else if(d[1]<40){
-                            return x(d[1])+40
+                            return(x(d[1]));
                         }
                         else{
-                            return x(d[1])+10
+                            return 0;
                         }
-
-
                     })
                     .delay((d,i) => {return i*50})
 
+                    mydata.target.isClicked=true;
+
+                }
+                else if(mydata.target.isClicked ==true){
+                    props.setSelected_column(null)
+
+                    svg.current.selectAll("rect")
+                        .data(data)
+                        .transition()
+                        .duration(500)
+                        .attr("width",  d => x(d[1]))
+                        .delay((d,i) => {return i*50})
+
+                    svg.current.selectAll(".label")
+                        .data(data)
+                        .transition()
+                        .duration(500)
+                        .attr("x", function (d){return x(0)+(((d[1].toString().length+3)/2)*12)})
+                        .delay((d,i) => {return i*50})
+
+                    svg.current.selectAll(".bar_out")
+                        .data(data)
+                        .transition()
+                        .duration(500)
+                        .attr("x", function (d){
+                            if(d[1]<10){
+                                return x(d[1])+55
+                            }
+                            else if(d[1]<15){
+                                return x(d[1])+52
+                            }
+                            else if(d[1]<40){
+                                return x(d[1])+40
+                            }
+                            else{
+                                return x(d[1])+10
+                            }
+
+
+                        })
+                        .delay((d,i) => {return i*50})
+
+
+                    svg.current.selectAll(".mainData")
+                        .data(dataAll)
+                        .transition()
+                        .duration(500)
+                        .attr("width", d => x(d[1]))
+                        .delay((d,i) => {return i*50})
+
+                    mydata.target.isClicked=false;
+
+
+
+                }
+
+                console.log(mydata.target.isClicked)
             })
 
 
-            svg.selectAll(".text")
+            // bardiagram.on("mouseout",function (mydata,myi) {
+            //     //console.log(myi[0]);
+            //     svg.selectAll("rect")
+            //         .data(data)
+            //         .transition()
+            //         .duration(500)
+            //         .attr("width",  d => x(d[1]))
+            //         .delay((d,i) => {return i*50})
+            //
+            //     svg.selectAll(".label")
+            //         .data(data)
+            //         .transition()
+            //         .duration(500)
+            //         .attr("x", function (d){return x(0)+(((d[1].toString().length+3)/2)*12)})
+            //         .delay((d,i) => {return i*50})
+            //
+            //     svg.selectAll(".bar_out")
+            //         .data(data)
+            //         .transition()
+            //         .duration(500)
+            //         .attr("x", function (d){
+            //             if(d[1]<10){
+            //                 return x(d[1])+55
+            //             }
+            //             else if(d[1]<15){
+            //                 return x(d[1])+52
+            //             }
+            //             else if(d[1]<40){
+            //                 return x(d[1])+40
+            //             }
+            //             else{
+            //                 return x(d[1])+10
+            //             }
+            //
+            //
+            //         })
+            //         .delay((d,i) => {return i*50})
+            //
+            //
+            //     svg.selectAll(".mainData")
+            //         .data(dataAll)
+            //         .transition()
+            //         .duration(500)
+            //         .attr("width", d => x(d[1]))
+            //         .delay((d,i) => {return i*50})
+            //
+            // })
+
+
+            svg.current.selectAll(".text")
                 .data(data)
                 .enter()
                 .append("text")
@@ -301,14 +433,14 @@ const Horizon_Bar = (props) => {
             //     .attr("x", function (d){return width*.08})
             //     .delay((d,i) => {return i*200})
         //test
-        svg.selectAll(".label")
+        svg.current.selectAll(".label")
             .data(data)
             .transition()
             .duration(2000)
             .attr("x", function (d){return x(0)+(((d[1].toString().length+3)/2)*12)})
             .delay((d,i) => {return i*200})
 
-            var bar_out_text = svg.selectAll(".text")
+            var bar_out_text = svg.current.selectAll(".text")
                 .data(data)
                 .enter()
                 .append("text")
@@ -323,7 +455,7 @@ const Horizon_Bar = (props) => {
                 .attr("y",function (d,i){ return y(d[0])+((y.bandwidth())/2+8)})
 
         //transition bar_out_text
-            svg.selectAll(".bar_out")
+            svg.current.selectAll(".bar_out")
                 .data(data)
                 .transition()
                 .duration(2000)
@@ -347,7 +479,7 @@ const Horizon_Bar = (props) => {
 
 
 
-    })
+    },[props.rawdata , props.selectedCluster,props.selectedClusterAlgo])
 
 
 

@@ -13,6 +13,7 @@ export const AppProvider = ({ children }) => {
     // }, [selectedMap]);
 
     useEffect(() => {
+        console.log("syncing")
         // Sync localStorage whenever selectedMap changes
         localStorage.setItem("selectedMap", JSON.stringify([selectedMap]));
         console.log(selectedMap)

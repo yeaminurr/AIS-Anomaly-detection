@@ -183,6 +183,7 @@ routes.post("/mmsi/:mid",async (req, res, next) => {
                 vesselName: 1,
                 vesselType: 1,
                 alert: 1,
+                id: 1,
                 tracks: {
                     $slice: [
                         {

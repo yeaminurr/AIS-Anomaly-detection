@@ -265,6 +265,7 @@ function App() {
           totalradar.current = data.length
           totalradarpredicted.current = data.filter(item => item.hausdorff_distance.mmsi !== 0).length;
           console.log( totalradarpredicted.current)
+          //console.log(data[0])
           //startDate.current = endDate.current = null;
 
         })

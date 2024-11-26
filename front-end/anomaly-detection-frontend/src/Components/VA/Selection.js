@@ -163,8 +163,35 @@ function Selection(props){
             .style("text-anchor", "end")
             .style("fill", "white")
             .text(d => `Cluster ${d}`);
+        clickValuesRender(props.SelectedData)
 
     }, [props.cluster_data,props.dataTypes, props.selectedCluster,props.device_height,props.device_width]);
+
+
+    function clickValuesRender(values){
+        const idsToClick = values.map(data=>data.key); // Array of IDs you want to "click"
+
+        if (Array.isArray(idsToClick) && idsToClick.length > 0){
+
+            idsToClick.forEach(id => {
+                var mycircle = d3.select("#svgScatterContainer").selectAll("circle").filter(function(d){return id === d.key}).node()
+                // console.log(mycircle)
+                // console.log(id)
+                // const circle = svg.current.select(`circle[data-key="${id}"]`);
+                console.log("cicked")
+                if (mycircle !== null) {
+                    console.log("cicked and got")
+                    // Simulate click
+                    mycircle.dispatchEvent(new Event("click"));
+
+                }
+            });}
+    }
+
+    useEffect(() => {
+        console.log(props.selectedCluster);
+    }, [props.selectedCluster]);
+
 
     // Programmatic click based on `tempstorage`
     useEffect(() => {

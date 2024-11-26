@@ -1,13 +1,16 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import * as d3 from "d3";
-const LineChart = (props) => {
+const LineChart_daily = (props) => {
     const lineChart = useRef(null);
     const svg = useRef();
+    const dataType = "all"
 
     useEffect( () => {
 
+        if(props.selected_column!=null){
 
-       function count_for_data(variable) {
+
+       function count_for_data(variable,column_name) {
            var mydata = []
            variable.forEach(d=>{
                const countsByDate = props.rawdata.filter(row => {
@@ -28,22 +31,24 @@ const LineChart = (props) => {
                    // If the date already exists in the accumulator, increment the count
                    if (acc[date]) {
                        acc[date].count += 1;
+                       acc[date].total+=entry[column_name]
+
                    } else {
                        // If the date does not exist, initialize it with count 1
-                       acc[date] = {date: date, count: 1};
+                       acc[date] = {date: date, count: 1,total:entry[column_name]};
                    }
 
                    return acc;
                }, {});
-               // Convert countsByDate object to an array and sort it by date
+               //Convert countsByDate object to an array and sort it by date
                const sortedData = Object.values(countsByDate).sort((a, b) => {
                    return new Date(a.date) - new Date(b.date);
                });
-               // Calculate the overall total count by summing all counts across dates
-               const totalCount = sortedData.reduce((sum, item) => sum + item.count, 0);
-               // Add percentage calculation for each date entry based on overall total count
+               //Calculate the overall total count by summing all counts across dates
+               //const totalCount = sortedData.reduce((sum, item) => sum + item.count, 0);
+               //Add percentage calculation for each date entry based on overall total count
                sortedData.forEach(item => {
-                   item.percentage = ((item.count / totalCount) * 100).toFixed(2); // Calculate percentage
+                   item.avg = (item.total / item.count) .toFixed(2); // Calculate percentage
                });
 
 
@@ -54,17 +59,11 @@ const LineChart = (props) => {
         }
         var getdata = []
         //console.log(countsByDate);
-        if(props.dataType == "all"){
-            getdata = count_for_data(["AIS","radar"]);
-            console.log(props.selectedCluster)
-        }
-        if(props.dataType=="AIS" || props.dataType=="radar"){
-            console.log(props.dataType);
-            getdata = count_for_data([props.dataType]);
-        }
+        getdata = count_for_data(["AIS","radar"],props.selected_column);
+       //console.log(props.selectedCluster)
 
 
-        //console.log(getdata)
+        //console.log(getdata[0])
 
 
         d3.select(lineChart.current).select("svg").remove();
@@ -111,7 +110,7 @@ const LineChart = (props) => {
         // Max value observed:
 
         const max = d3.max(allData, function (d) {
-            return +d.percentage;
+            return +d.avg;
         })
 
         // Add Y axis
@@ -142,7 +141,7 @@ const LineChart = (props) => {
         const area = d3.area()
             .x(d => x(d.date))
             .y0(height) // Set the baseline of the area to the x-axis
-            .y1(d => y(d.percentage)); // Set the top of the area to the line value
+            .y1(d => y(d.avg)); // Set the top of the area to the line value
 
         const colors = ["#00ffbc", "#ff00bc"]; // Add more colors if more datasets
 
@@ -160,7 +159,7 @@ const LineChart = (props) => {
                         return x(d.date)
                     })
                     .y(function (d) {
-                        return y(d.percentage)
+                        return y(d.avg)
                     })
                 )
 
@@ -205,12 +204,15 @@ const LineChart = (props) => {
             .attr("dy", ".35em")
             .style("text-anchor", "end")
             .style("fill", "white")
-            .text((d, i) => (props.dataType === "all" ? ["AIS", "Radar"][i] : props.dataType === "AIS"?"AIS":props.dataType === "radar"?"Radar":""));
+            .text((d, i) => (dataType === "all" ? ["AIS", "Radar"][i] : dataType === "AIS"?"AIS":dataType === "radar"?"Radar":""));
         }
         // })
 
-
-    },[props.device_height, props.device_width,props.rawdata , props.dataType,props.selectedCluster,props.selectedClusterAlgo])
+        }
+        else{
+            d3.select(lineChart.current).select("svg").remove();
+        }
+    },[props.device_height, props.device_width,props.rawdata , props.selectedCluster,props.selectedClusterAlgo,props.selected_column])
 
 
 
@@ -225,4 +227,4 @@ const LineChart = (props) => {
     )
 }
 
-export default LineChart;
+export default LineChart_daily;

@@ -121,6 +121,7 @@ const VesselDialog = (props) => {
         props.setdialogState(false);
     }
     function addClusterPage(){
+        console.log(props.currentDialog)
         setSelectedMap( props.currentDialog["id"])
 
 

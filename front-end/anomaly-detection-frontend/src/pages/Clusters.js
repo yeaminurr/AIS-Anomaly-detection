@@ -17,6 +17,7 @@ import Navbar from "../Components/VA/Navbar";
 import Toolbar from "@mui/material/Toolbar";
 import Radar_Chart from "../Components/VA/Radar_Chart";
 import {AppContext} from "../AppContext";
+import Classification from "../Components/VA/Classification";
 
 
 const darkTheme = createTheme({
@@ -88,16 +89,16 @@ function Clusters(){
 
     const handleDrop = (item) => {
 
-        setDroppedItems((prevItems) => {
-            // Check if the dropped item is already in the list
-            if (prevItems.includes(item)) {
-                alert("This is already there");
-                console.log("Item already exists:", item.name);
-                return prevItems;  // Return the same array if item is already there
-            } else {
-                const updatedItems = [...prevItems, item];
+                setDroppedItems((prevItems) => {
+                    // Check if the dropped item is already in the list
+                    if (prevItems.includes(item)) {
+                        alert("This is already there");
+                        console.log("Item already exists:", item.name);
+                        return prevItems;  // Return the same array if item is already there
+                    } else {
+                        const updatedItems = [...prevItems, item];
 
-                return updatedItems;  // Return the new array with the added item
+                        return updatedItems;  // Return the new array with the added item
             }
         });
     };
@@ -147,105 +148,117 @@ function Clusters(){
             <CssBaseline />
 
             <DndProvider backend={HTML5Backend}>
-        <div style={{padding:"5px"}}>
+                <div style={{padding: "5px"}}>
 
-                <div>
-                    <div style={{
-                        height: "100%",
-                        width: "100%",
-                        display: "flex"
-                    }}>
-                        <div>
-                        <h2 className="title">t-SNE Scatter Plot of KMeans Clusters</h2>
-                        <DropZone
-                            onDrop={handleDrop}
-                            onRemove={handleRemove}
-                            droppedItems={droppedItems}
-                        >
-
-                            <Selection
-                                cluster_data={cluster_data}
-                                device_height={size.height}
-                                device_width={size.width}
-                                dataTypes={droppedItems}
-                                setSelectedData = {setSelectedData}
-                                SelectedData = {selectedData}
-                                setCurrentSelection = {setCurrentSelection}
-                                tempStorage = {tempStorage}
-                                selectedCluster = {selectedCluster}
-
-                            />
-                        </DropZone>
-                        </div>
-                        <div style={{paddingTop: "50px", width: size.width*.20}}>
-
-                            <DraggableItem name="AIS Data" height={size.height} width={size.width}/>
-
-                            <DraggableItem name="Radar Data" height={size.height} width={size.width}/>
-
-
-                            <FormControl
-                                sx={{
-                                    width: size.width*.20,
-                                    marginLeft: "10px",
-                                    marginTop:"10px"
-                                }}
-                            >
-                                <InputLabel id="demo-simple-select-label">Cluster</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    //value={age}
-                                    label="Cluster"
-                                    onChange={clusterSelect}
-                                    value={selectedCluster}
+                    <div>
+                        <div style={{
+                            height: "100%",
+                            width: "100%",
+                            display: "flex"
+                        }}>
+                            <div>
+                                <h2 className="title">t-SNE Scatter Plot of KMeans Clusters</h2>
+                                <DropZone
+                                    onDrop={handleDrop}
+                                    onRemove={handleRemove}
+                                    droppedItems={droppedItems}
                                 >
-                                    <MenuItem value={"Kmeans_cluster"}>
-                                       KMeans Clustering
-                                    </MenuItem>
-                                    <MenuItem value={"BMM_cluster"}>
-                                        Bayesian Gaussian Mixture
-                                    </MenuItem>
+
+                                    <Selection
+                                        cluster_data={cluster_data}
+                                        device_height={size.height}
+                                        device_width={size.width}
+                                        dataTypes={droppedItems}
+                                        setSelectedData={setSelectedData}
+                                        SelectedData={selectedData}
+                                        setCurrentSelection={setCurrentSelection}
+                                        tempStorage={tempStorage}
+                                        selectedCluster={selectedCluster}
+
+                                    />
+                                </DropZone>
+                            </div>
+                            <div style={{paddingTop: "50px", width: size.width * .20}}>
+
+                                <DraggableItem name="AIS Data" height={size.height} width={size.width}/>
+
+                                <DraggableItem name="Radar Data" height={size.height} width={size.width}/>
 
 
-                                </Select>
-                            </FormControl>
+                                <FormControl
+                                    sx={{
+                                        width: size.width * .20,
+                                        marginLeft: "10px",
+                                        marginTop: "10px"
+                                    }}
+                                >
+                                    <InputLabel id="demo-simple-select-label">Cluster</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        //value={age}
+                                        label="Cluster"
+                                        onChange={clusterSelect}
+                                        value={selectedCluster}
+                                    >
+                                        <MenuItem value={"Kmeans_cluster"}>
+                                            KMeans Clustering
+                                        </MenuItem>
+                                        <MenuItem value={"BMM_cluster"}>
+                                            Bayesian Gaussian Mixture
+                                        </MenuItem>
+
+
+                                    </Select>
+                                </FormControl>
+                            </div>
+
+
                         </div>
-
-
                     </div>
+
+
+                    {/*<div>*/}
+                    {/*    <FormControl variant="filled" sx={{ m: 1, minWidth: 120 }}>*/}
+                    {/*        <InputLabel id="demo-simple-select-filled-label">Age</InputLabel>*/}
+                    {/*        <Select*/}
+                    {/*            labelId="demo-simple-select-filled-label"*/}
+                    {/*            id="demo-simple-select-filled"*/}
+                    {/*            value={dataType}*/}
+                    {/*            onChange={handleChange}*/}
+                    {/*        >*/}
+                    {/*            <MenuItem value="">*/}
+                    {/*                <em>None</em>*/}
+                    {/*            </MenuItem>*/}
+                    {/*            <MenuItem value={10}>AIS Data</MenuItem>*/}
+                    {/*            <MenuItem value={20}>Radar Data</MenuItem>*/}
+                    {/*            <MenuItem value={30}>Both</MenuItem>*/}
+                    {/*        </Select>*/}
+                    {/*    </FormControl>*/}
+
+                    {/*</div>*/}
+                    <div style={{
+                        alignContent: "center",
+                        justifyContent: "center",
+                    }}>
+                        <Classification
+
+                            cluster_data={cluster_data}
+                            device_height={size.height}
+                            device_width={size.width}
+                            tempStorage={tempStorage}
+                        />
+                    </div>
+
+                    <Radar_Chart
+                        selectedData={selectedData}
+                        device_height={size.height}
+                    />
+
+
                 </div>
-
-
-            {/*<div>*/}
-            {/*    <FormControl variant="filled" sx={{ m: 1, minWidth: 120 }}>*/}
-            {/*        <InputLabel id="demo-simple-select-filled-label">Age</InputLabel>*/}
-            {/*        <Select*/}
-           {/*            labelId="demo-simple-select-filled-label"*/}
-           {/*            id="demo-simple-select-filled"*/}
-           {/*            value={dataType}*/}
-           {/*            onChange={handleChange}*/}
-           {/*        >*/}
-           {/*            <MenuItem value="">*/}
-           {/*                <em>None</em>*/}
-           {/*            </MenuItem>*/}
-           {/*            <MenuItem value={10}>AIS Data</MenuItem>*/}
-           {/*            <MenuItem value={20}>Radar Data</MenuItem>*/}
-           {/*            <MenuItem value={30}>Both</MenuItem>*/}
-           {/*        </Select>*/}
-           {/*    </FormControl>*/}
-
-           {/*</div>*/}
-
-            <Radar_Chart
-                selectedData = {selectedData}
-                device_height={size.height}
-            />
-
-
-        </div>
             </DndProvider>
-            </ThemeProvider>
+        </ThemeProvider>
     )
 
 }

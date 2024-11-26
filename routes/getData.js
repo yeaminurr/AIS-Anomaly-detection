@@ -251,6 +251,7 @@ routes.post('/mongo',async (req, res, next) => {
                     mmsi:1,
                     distance:1
                 },
+                id:1
 
             }
         },

@@ -13,8 +13,8 @@ const Circle_Chart = (props) => {
         if(props.selectedCluster != null && props.selectedCluster!="all" ){
 
 
-            const countsByType = props.rawdata.filter(row => row.source === "AIS" && row.Kmeans_cluster === props.selectedCluster ).reduce((acc, entry) => {
-                const type = entry.mapped_target_name;
+            const countsByType = props.rawdata.filter(row => row.source === "AIS" && row[props.selectedClusterAlgo] === props.selectedCluster ).reduce((acc, entry) => {
+                const type = entry.mapped_target_name_shorten;
 
                 // If the date already exists in the accumulator, increment the count
                 if (acc[type]) {
@@ -34,7 +34,7 @@ const Circle_Chart = (props) => {
             countsArray.forEach(item => {
                 item.percentage = parseFloat(((item.count / totalCount) * 100).toFixed(2)); // Calculate percentage
             });
-            const countsArraySliced = countsArray.slice(0,8);
+            const countsArraySliced = countsArray.slice(0,5);
 
 
 
@@ -51,7 +51,7 @@ const Circle_Chart = (props) => {
 
         const margin = {top: 10, right: 60, bottom: 60, left: 60}
         const height = props.device_height - (props.device_height * .75)  - margin.top - margin.bottom;
-        const width = props.device_width - (props.device_width * .20) - margin.left - margin.right;
+        const width = props.device_width - (props.device_width * .40) - margin.left - margin.right;
 
 // append the svg object to the body of the page
         svg.current = d3.select(chartRef.current)
@@ -114,13 +114,13 @@ const Circle_Chart = (props) => {
                 .text(function (d){return d.type})
                 .attr("font-size", d=>{
                     if (d.type.length>20){
-                        return  x.bandwidth()/2*.25+'px'
+                        return  x.bandwidth()/2*.17+'px'
                     }
                     else if(d.type.length>11){
-                        return  x.bandwidth()/2*.3+'px'
+                        return  x.bandwidth()/2*.28+'px'
                     }
                     else{
-                        return  x.bandwidth()/2*.4+'px'
+                        return  x.bandwidth()/2*.38+'px'
                     }
 
 
@@ -178,7 +178,7 @@ const Circle_Chart = (props) => {
             d3.select(chartRef.current).select("svg").remove();
         }
 
-    },[props.device_height, props.device_width,props.rawdata , props.selectedCluster]);
+    },[props.device_height, props.device_width,props.rawdata , props.selectedCluster, props.selectedClusterAlgo]);
 
 
 

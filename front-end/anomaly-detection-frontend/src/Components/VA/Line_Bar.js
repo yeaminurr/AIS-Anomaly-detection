@@ -131,7 +131,7 @@ const Line_Bar = props => {
             //     .attr('fill', '#69a3b2');
 
 
-    },[props.device_width,props.device_height,props.line]);
+    },[props.device_width,props.device_height,props.line,props.selectedClusterAlgo]);
             return(
                 <div ref = {chartRefNbar}
                      // style={{transform:'scale(.6)'}}
