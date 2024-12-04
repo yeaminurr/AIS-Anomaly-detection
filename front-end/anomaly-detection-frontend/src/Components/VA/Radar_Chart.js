@@ -25,6 +25,7 @@ function Radar_Chart(props) {
                 meta: { color: colors[index % colors.length] },
             }));
             setAdjustedData(newData);
+            console.log(newData);
 
         }
     }, [props.selectedData]);
@@ -34,7 +35,7 @@ function Radar_Chart(props) {
     // Radar chart options
     const defaultOptions = {
         axes: true,
-        scales: 1,
+        scales: .5,
         captions: true,
         captionMargin: 35,
         dots: true,
@@ -52,7 +53,7 @@ function Radar_Chart(props) {
 
     return (
         <div >
-            <h2 className="title" style={{ textAlign: "center"}}>Select points from the scatterplot to compare data.</h2>
+            <h2 className="title" style={{ textAlign: "center"}}>Selected Vessel Data for Comparison</h2>
             <div style={{ textAlign: "center", marginTop: "-48px" }}>
                 <RadarChart
                     options={defaultOptions}

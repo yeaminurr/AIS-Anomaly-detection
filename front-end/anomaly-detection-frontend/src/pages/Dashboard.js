@@ -262,6 +262,7 @@ const Dashboard = () => {
             </div>
             <p></p>
             <div style={{textAlign: "center"}}>
+                <h3>Number of Vessels by Day (And by Cluster If Selected)</h3>
 
 
                 <LineChart

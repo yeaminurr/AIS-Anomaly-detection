@@ -38,6 +38,7 @@ function Clusters(){
     const [currentSelection, setCurrentSelection] = React.useState([]);
     const { selectedMap, setSelectedMap} = useContext(AppContext);
     const [selectedCluster,setSelectedCluster] = useState("Kmeans_cluster");
+    const [countPrediction,setCountPrediction] = useState(false);
 
 
 
@@ -157,11 +158,15 @@ function Clusters(){
                             display: "flex"
                         }}>
                             <div>
-                                <h2 className="title">t-SNE Scatter Plot of KMeans Clusters</h2>
+
+                                {selectedCluster == "Kmeans_cluster" ?
+                                    <h2 className="title">T-SNE Scatter Plot of Vessels in K-Means Clusters</h2> :
+                                    <h2 className="title">T-SNE Scatter Plot of Vessels in Bayesian Gaussian Mixture Clusters</h2>}
                                 <DropZone
                                     onDrop={handleDrop}
                                     onRemove={handleRemove}
                                     droppedItems={droppedItems}
+
                                 >
 
                                     <Selection
@@ -179,6 +184,7 @@ function Clusters(){
                                 </DropZone>
                             </div>
                             <div style={{paddingTop: "50px", width: size.width * .20}}>
+                                <h7>Drag and Drop Boxes to the Left to Visualize Data</h7>
 
                                 <DraggableItem name="AIS Data" height={size.height} width={size.width}/>
 
@@ -247,7 +253,27 @@ function Clusters(){
                             device_height={size.height}
                             device_width={size.width}
                             tempStorage={tempStorage}
+                            algorithm = {"gboost"}
+                            text = {"Gradient Boosting"}
+                            countPrediction = {countPrediction}
+                            setCountPrediction = {setCountPrediction}
                         />
+                        {countPrediction &&
+                            <Classification
+
+                                cluster_data={cluster_data}
+                                device_height={size.height}
+                                device_width={size.width}
+                                tempStorage={tempStorage}
+                                algorithm = {"adaboost"}
+                                text = {"Ada Boosting"}
+                                countPrediction = {countPrediction}
+                                setCountPrediction = {setCountPrediction}
+
+                            />
+                        }
+
+
                     </div>
 
                     <Radar_Chart

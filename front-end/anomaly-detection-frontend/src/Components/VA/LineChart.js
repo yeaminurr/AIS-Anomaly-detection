@@ -146,9 +146,39 @@ const LineChart = (props) => {
 
         const colors = ["#00ffbc", "#ff00bc"]; // Add more colors if more datasets
 
+        const tooltip = d3
+            .select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("position", "absolute")
+            .style("background", "#4c4c4c")
+            .style("border", "1px solid #ccc")
+            .style("padding", "5px")
+            .style("border-radius", "5px")
+            .style("box-shadow", "0px 0px 5px rgba(0,0,0,0.3)")
+            .style("pointer-events", "none")
+            .style("opacity", 0);
+        d3.selectAll(".tooltip").style("opacity", 0);
+
+
 
 
         getdata.forEach((dataset, i) => {
+            if (props.dataType === "all"){
+                if(i==0){
+                    var source = "AIS"
+                }
+                else{
+                    var source = "Radar"
+                }
+            }
+            else if(props.dataType === "AIS"){
+                var source = "AIS"
+            }
+            else{
+                var source = "Radar"
+            }
+
             // Add the line
             svg.current.append("path")
                 .datum(dataset)
@@ -165,21 +195,53 @@ const LineChart = (props) => {
                 )
 
 
+
+
+
             // Add the area path
             svg.current.append("path")
                 .datum(dataset)
-                .attr("class","areas")
+                .attr("class","areas"+i)
                 .attr("fill", colors[i % colors.length]) // Use the gradient as the fill
                 .style("opacity", 0.2)
-                .attr("d", area);
+                .attr("d", area)
 
-            svg.current.selectAll(".areas").on("mouseover", function (e) {
+
+            svg.current.selectAll(".areas"+i).on("mouseover", function (e,d) {
                 d3.select(this).style("opacity", 1);
+
+                // tooltip
+                //     .style("opacity", 1)
+                //     .html(`<strong> Source - ${d.source}</strong><br>Vessel Type -  ${d.mapped_target_name_shorten }<br> KMeans Cluster - ${d.Kmeans_cluster }<br>Bayesian Gaussian Mixture - ${d.BMM_cluster } `)
+                //     .style("left", `${event.pageX + 10}px`)
+                //     .style("top", `${event.pageY + 10}px`);
+                tooltip.style("opacity", 1);
+
+
+            }).on("mousemove", function (e) {
+                const [xCoord] = d3.pointer(e, this);
+                const hoveredDate = x.invert(xCoord);
+                const closestDataPoint = dataset.reduce((prev, curr) =>
+                    Math.abs(curr.date - hoveredDate) < Math.abs(prev.date - hoveredDate) ? curr : prev
+                );
+
+                tooltip
+                    .style("left", `${e.pageX + 10}px`)
+                    .style("top", `${e.pageY + 10}px`)
+                    .html(`
+                        <strong>Source:</strong> ${source}<br>
+                    <strong>Date:</strong> ${closestDataPoint.date.toDateString()}<br>
+                    <strong>Number of Data:</strong> ${closestDataPoint.count}
+                `);
             });
 
-            svg.current.selectAll(".areas").on("mouseout", function (e) {
+
+            svg.current.selectAll(".areas"+i).on("mouseout", function (e) {
                 d3.select(this).style("opacity", 0.2);
+                tooltip.style("opacity", 0);
             });
+
+
 
 
         });

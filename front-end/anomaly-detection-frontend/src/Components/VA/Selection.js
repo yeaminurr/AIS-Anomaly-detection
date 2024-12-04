@@ -67,6 +67,17 @@ function Selection(props){
 
         // Define color scheme for KMeans clusters
         const colors = d3.schemeTableau10;
+        const tooltip = d3
+            .select("body")
+            .append("div")
+            .style("position", "absolute")
+            .style("background", "#4c4c4c")
+            .style("border", "1px solid #ccc")
+            .style("padding", "5px")
+            .style("border-radius", "5px")
+            .style("box-shadow", "0px 0px 5px rgba(0,0,0,0.3)")
+            .style("pointer-events", "none")
+            .style("opacity", 0);
 
         // Add scatter points
         svg.current.selectAll("circle")
@@ -93,6 +104,8 @@ function Selection(props){
                         }
                         return prevItems; // If 'd' is already in the array, return without changes
                     });
+
+
 
 
 
@@ -129,6 +142,33 @@ function Selection(props){
                     .duration(200)
                     //.attr("r", 8)
                     .style("opacity", 1);
+                if(d.source === "AIS"){
+
+                tooltip
+                    .style("opacity", 1)
+                    .html(`<strong> Source - ${d.source}</strong><br>Vessel Type -  ${d.mapped_target_name_shorten }<br> KMeans Cluster - ${d.Kmeans_cluster }<br>Bayesian Gaussian Mixture - ${d.BMM_cluster } `)
+                    .style("left", `${event.pageX + 10}px`)
+                    .style("top", `${event.pageY + 10}px`);
+                }
+                else{
+
+
+                        tooltip
+                            .style("opacity", 1)
+                            .html(`<strong> Source - ${d.source}</strong><br> KMeans Cluster - ${d.Kmeans_cluster }<br>Bayesian Gaussian Mixture - ${d.BMM_cluster } `)
+                            .style("left", `${event.pageX + 10}px`)
+                            .style("top", `${event.pageY + 10}px`);
+
+                }
+                //console.log(d)
+
+
+
+            })
+            .on("mousemove", event => {
+                tooltip
+                    .style("left", `${event.pageX + 10}px`)
+                    .style("top", `${event.pageY + 10}px`);
             })
             .on("mouseout", function (e,d) {
                 //if(e.target.mousefire!="on"){
@@ -137,6 +177,7 @@ function Selection(props){
                     .duration(200)
                     //.attr("r", 2)
                     .style("opacity", 0.7);
+                tooltip.style("opacity", 0);
 
             //}
             });

@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import * as ort from 'onnxruntime-web';
 import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
+import {Container, LinearProgress} from "@mui/material";
 
 
 const Classification = (props) =>{
@@ -14,6 +15,10 @@ const Classification = (props) =>{
     const chartRefbar = useRef(null);
     const svg = useRef(null);
     const [showPredictionChart, setShowPredictionChart] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [showAIS,setShowAIS] = useState(false);
+    const [aisType,setAisType] = useState("");
+
 
 
 
@@ -33,17 +38,37 @@ const Classification = (props) =>{
 
             setShowPrediction(true);
             setShowPredictionChart(false)
+            setShowAIS(false)
             console.log("showing prediction");
+            props.setCountPrediction(true)
         }
-        else{
+        else {
             setShowPrediction(false);
             setShowPredictionChart(false)
+            setShowAIS(true);
+            //var dataType= data[0].mapped_target_name_shorten
+            setAisType(getSources(data[0].mapped_target_name_shorten))
+            props.setCountPrediction(false)
+
         }
         }
     }, [data]);
 
+    function getSources(name) {
+        if (name === 'Cargo Ships') {
+            return 'Cargo Ships';
+        } else if (name === 'Support and Utility Vessels' || name === 'Military ops') {
+            return 'Support, Utility, and Military Vessels';
+        } else if (name === 'Passenger and Recreational' || name === 'Others') {
+            return 'Passenger, Recreational, and Others';
+        } else {
+            return null; // Handle unexpected values or -1
+        }
+    }
+
 
     function doPrediction() {
+        setLoading(true);
         const prediction_data=[
             data[0].min_speed_s,
             data[0].max_speed_s,
@@ -55,6 +80,7 @@ const Classification = (props) =>{
             data[0].dist_diff__s
         ]
         console.log(prediction_data)
+        var selectedAlgo = props.algorithm
         fetch(`http://localhost:5001/predict`,{
             method: 'POST',
             headers: {
@@ -62,11 +88,12 @@ const Classification = (props) =>{
             },
             body:JSON.stringify({
                 "features": prediction_data,
-                "algorithm":"gboost"
+                "algorithm":selectedAlgo
             })
 
         }).then((response) => response.json())
             .then((data) =>{
+                setLoading(false);
                 //console.log(data);
 
                 setPredictionData(data)
@@ -230,22 +257,39 @@ const Classification = (props) =>{
 
         }
     },[predictionData])
+    useEffect(()=>{
+        console.log(loading)},[loading])
 
 
+    return (
+
+        <div style={{
+            textAlign: "center",
+            alignContent: "center",
+            alignItems: 'center',
+            justifyContent: "center",
+            display: "flex",
+            margin: "15px"
+        }}>
+            {showAIS  &&
+                <Box component="section" sx={{
+                    p: 2,
+                    backgroundColor: '#636363',
+                    width: props.device_width * .40,
+                    textAlign: 'center',
+                    justifyContent: "center",
+                    display: "flex",
+                    boxShadow: "2px 2px 2px 0 rgba(255,255,255, 0.5)", // Optional for styling
+                    borderRadius: 2, // Optional for rounded corners
+
+                }}>
+                    <h4 style={{textAlign: "center"}}>Vessel Source AIS - Category {aisType}</h4>
+
+                </Box>
+
+            }
 
 
-
-
-
-
-
-
-
-
-
-    return(
-
-        <div style={{textAlign: "center", alignContent:"center",alignItems: 'center',justifyContent: "center", display:"flex", margin:"15px"}}>
             {showPrediction &&
                 <Box component="section" sx={{
                     p: 2,
@@ -259,23 +303,38 @@ const Classification = (props) =>{
 
                 }}>
 
-                        <Stack direction="column" sx={{alignItems: "center"}}>
+
+
+
+                    <Stack  sx={{alignItems: "center"  }}>
+
                         <Stack direction="row"
                                spacing={3}
                                sx={{alignItems: "center"}}>
-                            <h4 style={{textAlign: "center"}}>Predict Using Gradient Boosting Algorithm</h4>
+                            <h4 style={{textAlign: "center"}}>Predict Using {props.text} Algorithm</h4>
                             <Button variant="contained" onClick={doPrediction}>Predict</Button>
 
                             {showPredictionChart &&
-                                <Button variant="contained" onClick={()=>{setShowPredictionChart(false)}}>Close Prediction</Button>
+                                <Button variant="contained" onClick={() => {
+                                    setShowPredictionChart(false)
+                                }}>Close Prediction</Button>
                             }
-                            <Button variant="contained" onClick={()=>{setShowPrediction(false)}}>Clear This Portion</Button>
+                            <Button variant="contained" onClick={() => {
+                                setShowPrediction(false)
+                            }}>Clear This Portion</Button>
 
 
                         </Stack>
 
 
+                        {loading &&
 
+                                <Box sx={{ width: '100%' }}>
+                                    <p></p>
+                                    <LinearProgress />
+                                </Box>
+
+                        }
                         {showPredictionChart &&
                             <div style={{
                                 justifyContent: "center",
@@ -284,14 +343,33 @@ const Classification = (props) =>{
                                 <div ref={chartRefbar} id="hbardiv"></div>
                             </div>
                         }
-                        </Stack>
+
+
+
+
+
+
+                    </Stack>
+
+
+
+
+
+
+
+
+
+
+                    {/* LinearProgress aligned to the bottom */}
 
 
                 </Box>
+
             }
 
 
+
         </div>
-    )
+    );
 }
 export default Classification;

@@ -15,9 +15,17 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import * as DrawerAppBar from "@mui/material/Slider/SliderValueLabel";
+//import {Link} from "@mui/material";
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
-const navItems = ['Home', 'Clusters', 'Contact'];
+//const navItems = ['Map', 'Clusters', 'Dashboard'];
+const navItems = [
+    { label: 'Map', path: '/' },
+    { label: 'Clusters', path: '/clusters' },
+    { label: 'Dashboard', path: '/dashboard' },
+];
+
 
 function Navbar(props) {
     const { window } = props;
@@ -35,9 +43,11 @@ function Navbar(props) {
             <Divider />
             <List>
                 {navItems.map((item) => (
-                    <ListItem key={item} disablePadding>
+                    <ListItem key={item.label} disablePadding>
                         <ListItemButton sx={{ textAlign: 'center' }}>
-                            <ListItemText primary={item} />
+                            <Link to={item.path} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <ListItemText primary={item.label} />
+                            </Link>
                         </ListItemButton>
                     </ListItem>
                 ))}
@@ -66,12 +76,14 @@ function Navbar(props) {
                         component="div"
                         sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
                     >
-                        MUI
+                        Vessel Data Visualizer
                     </Typography>
                     <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                         {navItems.map((item) => (
-                            <Button key={item} sx={{ color: '#fff' }}>
-                                {item}
+                            <Button key={item.label} sx={{ color: '#fff' }}>
+                                <Link to={item.path} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    {item.label}
+                                </Link>
                             </Button>
                         ))}
                     </Box>

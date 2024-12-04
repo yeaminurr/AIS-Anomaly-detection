@@ -22,13 +22,15 @@ def predict():
         data = request.get_json()
         features = data.get("features", None)
         algorithm = data.get("algorithm", None)
-        if(algorithm=="gboost" or algorithm==None):
+        if(algorithm=="adaboost"):
             # Load the saved model
-            MODEL_PATH = "./ML_Model/gradientBoosting.pkl"  # Replace with the path to your .pkl file
+            print("aboost Using")
+            MODEL_PATH = "./ML_Model/adaBoosting.pkl"  # Replace with the path to your .pkl file
             with open(MODEL_PATH, "rb") as file:
                 model = pickle.load(file)
         else:
             # Load the saved model
+            print("gboost Using")
             MODEL_PATH = "./ML_Model/gradientBoosting.pkl"  # Replace with the path to your .pkl file
             with open(MODEL_PATH, "rb") as file:
                 model = pickle.load(file)
