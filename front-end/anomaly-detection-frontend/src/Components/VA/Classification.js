@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import * as d3 from "d3";
 import Box from '@mui/material/Box';
 import Button from "@mui/material/Button";
-import * as ort from 'onnxruntime-web';
+//import * as ort from 'onnxruntime-web';
 import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
 import {Container, LinearProgress} from "@mui/material";

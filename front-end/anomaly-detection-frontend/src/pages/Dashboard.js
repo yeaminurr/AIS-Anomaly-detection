@@ -271,71 +271,86 @@ const Dashboard = () => {
                     rawdata={rawdData}
                     dataType={dataType}
                     selectedCluster={selectedCluster}
-                    selectedClusterAlgo={ selectedClusterAlgo}
+                    selectedClusterAlgo={selectedClusterAlgo}
                 />
                 <Circle_Chart
                     device_height={size.height}
                     device_width={size.width}
                     selectedCluster={selectedCluster}
                     rawdata={rawdData}
-                    selectedClusterAlgo={ selectedClusterAlgo}
+                    selectedClusterAlgo={selectedClusterAlgo}
                 />
 
-                <div style={{justifyContent: "center",
+
+                <div style={{
+                    justifyContent: "center",
                     display: "flex",
                 }}>
-                <Stack
-                    direction="row"
-                    sx={{ flexWrap: 'wrap' }}
-                    divider={<Divider orientation="vertical" style={{borderInlineWidth:"1px", borderColor:"#FFFFFF"}} flexItem />}
-                    spacing={15}
-                >
-
-                        <Stack
-                            direction="row"
-                            spacing={2}
-                        >
-                            <Line_Bar line={["AIS", parseInt(totalCount[0])]}
-                                      device_height={size.height}
-                                      device_width={size.width}
-                                      selectedClusterAlgo={ selectedClusterAlgo}/>
-                            <Line_Bar line={["Radar", parseInt(totalCount[1])]}
-                                      device_height={size.height}
-                                      device_width={size.width}
-                                      selectedClusterAlgo={ selectedClusterAlgo}/>
-                        </Stack>
-                    <Horizon_Bar
-                        device_height={size.height}
-                        device_width={size.width}
-                        rawdata = {rawdData}
-                        selectedCluster={selectedCluster}
-                        selectedClusterAlgo={ selectedClusterAlgo}
-                        setSelected_column = {setSelected_column}
-                        sizeref={sizeref}
-                    />
 
 
+                    <Stack
+                        direction="row"
+                        sx={{flexWrap: 'wrap'}}
+                        divider={<Divider orientation="vertical"
+                                          style={{borderInlineWidth: "1px", borderColor: "#FFFFFF"}} flexItem/>}
+                        spacing={15}
+                    >
 
-                </Stack>
 
+                        <div style={{
+                            justifyContent: "center",
+
+                        }}>
+                            <Stack
+                                direction="column"
+                                spacing={2}
+                            >
+                            <h5>Number of Vessels by Day (And by Cluster If Selected)</h5>
+                            <Stack
+                                direction="row"
+                                spacing={2}
+                            >
+                                <Line_Bar line={["AIS", parseInt(totalCount[0])]}
+                                          device_height={size.height}
+                                          device_width={size.width}
+                                          selectedClusterAlgo={selectedClusterAlgo}/>
+                                <Line_Bar line={["Radar", parseInt(totalCount[1])]}
+                                          device_height={size.height}
+                                          device_width={size.width}
+                                          selectedClusterAlgo={selectedClusterAlgo}/>
+                            </Stack>
+                            </Stack>
+                        </div>
+                        <Horizon_Bar
+                            device_height={size.height}
+                            device_width={size.width}
+                            rawdata={rawdData}
+                            selectedCluster={selectedCluster}
+                            selectedClusterAlgo={selectedClusterAlgo}
+                            setSelected_column={setSelected_column}
+                            sizeref={sizeref}
+                        />
+
+
+                    </Stack>
 
 
                 </div>
-                <div style={{justifyContent: "center",
-                    display: "flex",marginTop: "10px"
+                <div style={{
+                    justifyContent: "center",
+                    display: "flex", marginTop: "10px"
                 }}>
                     <LineChart_daily
-                        selected_column = {selected_column}
+                        selected_column={selected_column}
                         device_height={size.height}
                         device_width={size.width}
                         rawdata={rawdData}
                         selectedCluster={selectedCluster}
-                        selectedClusterAlgo={ selectedClusterAlgo}
+                        selectedClusterAlgo={selectedClusterAlgo}
 
                     />
 
                 </div>
-
 
 
             </div>

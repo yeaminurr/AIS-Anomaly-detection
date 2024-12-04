@@ -174,6 +174,18 @@ const Horizon_Bar = (props) => {
             //     .attr("fill", "#69b3a2")
             //     .attr("padding","20px");
     // Mainbar
+
+        const tooltip = d3
+            .select("body")
+            .append("div")
+            .style("position", "absolute")
+            .style("background", "#4c4c4c")
+            .style("border", "1px solid #ccc")
+            .style("padding", "5px")
+            .style("border-radius", "5px")
+            .style("box-shadow", "0px 0px 5px rgba(0,0,0,0.3)")
+            .style("pointer-events", "none")
+            .style("opacity", 0);
     //for transition modified bar
     var bardiagram = svg.current.selectAll("all")
         .append('g')
@@ -184,7 +196,34 @@ const Horizon_Bar = (props) => {
         .attr("width", 0)
         .attr("height", y.bandwidth())
         .attr("fill", "#FCB344")
-        .attr("padding","20px");
+        .attr("padding","20px")
+        .on("mouseover", function (event, d) {
+
+            if(d[1]<100){
+                tooltip
+                    .style("opacity", 1)
+                    .html(`Average Value of ${d[0]} is ${100-d[1]}% lower in this cluster`)
+                    .style("left", `${event.pageX + 10}px`)
+                    .style("top", `${event.pageY + 10}px`);
+            }
+            else if(d[1]>100){
+                tooltip
+                    .style("opacity", 1)
+                    .html(`Average Value of ${d[0]} is ${d[1]-100}% more in this cluster`)
+                    .style("left", `${event.pageX + 10}px`)
+                    .style("top", `${event.pageY + 10}px`);
+            }
+        })
+    .on("mousemove", event => {
+            tooltip
+                .style("left", `${event.pageX + 10}px`)
+                .style("top", `${event.pageY + 10}px`);
+        })
+        .on("mouseout", function (e,d) {
+            tooltip.style("opacity", 0);
+
+        });
+
 
             svg.current.selectAll("rect")
                 .data(data)
